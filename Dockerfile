@@ -48,7 +48,8 @@ ENV OPENSSL_CONF=/etc/openssl_legacy.cnf
 
 WORKDIR /app
 
-RUN apk add --no-cache libpq vips redis vips-heif onnxruntime
+RUN apk update && apk add --no-cache libpq vips redis vips-heif && \
+    apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community onnxruntime
 
 RUN addgroup -g 2000 docuseal && adduser -u 2000 -G docuseal -s /bin/sh -D -h /home/docuseal docuseal
 

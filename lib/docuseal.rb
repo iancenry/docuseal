@@ -6,7 +6,7 @@ module Docuseal
   NEWSLETTER_URL = "#{PRODUCT_URL}/newsletters".freeze
   ENQUIRIES_URL = "#{PRODUCT_URL}/enquiries".freeze
   PRODUCT_NAME = 'DocuSeal'
-  DEFAULT_APP_URL = ENV.fetch('APP_URL', 'http://localhost:3000')
+  DEFAULT_APP_URL = ENV.fetch('APP_URL', 'http://localhost:4000')
   GITHUB_URL = 'https://github.com/docusealco/docuseal'
   DISCORD_URL = 'https://discord.gg/qygYCDGck9'
   TWITTER_URL = 'https://twitter.com/docusealco'
@@ -23,12 +23,12 @@ module Docuseal
                   'https://console.docuseal.com'
                 end
   CLOUD_URL = if Rails.env.development?
-                'http://localhost:3000'
+                'http://localhost:4000'
               else
                 'https://docuseal.com'
               end
   CDN_URL = if Rails.env.development?
-              'http://localhost:3000'
+              'http://localhost:4000'
             elsif ENV['MULTITENANT'] == 'true'
               "https://cdn.#{HOST}"
             else

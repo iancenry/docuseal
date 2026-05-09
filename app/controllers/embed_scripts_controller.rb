@@ -1,38 +1,105 @@
 # frozen_string_literal: true
 
 class EmbedScriptsController < ActionController::Metal
-  DUMMY_SCRIPT = <<~JAVASCRIPT.freeze
-    const DummyBuilder = class extends HTMLElement {
-      connectedCallback() {
-        this.innerHTML = `
-          <div style="text-align: center; padding: 20px; font-family: Arial, sans-serif;">
-            <h2>Upgrade to Pro</h2>
-            <p>Unlock embedded components by upgrading to Pro</p>
-            <div style="margin-top: 40px;">
-              <a href="#{Docuseal::CONSOLE_URL}/on_premises" target="_blank" style="padding: 15px 25px; background-color: #222; color: white; text-decoration: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
-                Learn More
-              </a>
-            </div>
-          </div>
-        `;
+  EMBED_SCRIPT = <<~JAVASCRIPT.freeze
+    (function() {
+      const DEFAULT_HOST = window.location.origin;
+
+      class DocuSealBuilder extends HTMLElement {
+        connectedCallback() {
+          const token = this.getAttribute('data-token');
+          const templateId = this.getAttribute('data-template-id');
+          const host = this.getAttribute('data-host') || DEFAULT_HOST;
+          const width = this.getAttribute('data-width') || '100%';
+          const height = this.getAttribute('data-height') || '800px';
+
+          if (!token) {
+            this.innerHTML = '<p style="color:red;">Error: data-token attribute is required</p>';
+            return;
+          }
+
+          const iframe = document.createElement('iframe');
+          const params = new URLSearchParams({ token: token });
+          if (templateId) params.set('template_id', templateId);
+
+          iframe.src = host + '/embed/builder?' + params.toString();
+          iframe.style.width = width;
+          iframe.style.height = height;
+          iframe.style.border = 'none';
+          iframe.setAttribute('allowfullscreen', 'true');
+          iframe.setAttribute('allow', 'clipboard-write');
+
+          this.appendChild(iframe);
+
+          // Listen for postMessage events from iframe
+          window.addEventListener('message', function(event) {
+            if (event.source !== iframe.contentWindow) return;
+            if (!event.data || !event.data.type) return;
+            if (!event.data.type.startsWith('docuseal:')) return;
+
+            const customEvent = new CustomEvent(event.data.type, { detail: event.data.data });
+            this.dispatchEvent(customEvent);
+          }.bind(this));
+        }
       }
-    };
 
-    const DummyForm = class extends DummyBuilder {};
+      class DocuSealForm extends HTMLElement {
+        connectedCallback() {
+          const token = this.getAttribute('data-token');
+          const submissionId = this.getAttribute('data-submission-id');
+          const slug = this.getAttribute('data-slug');
+          const email = this.getAttribute('data-email');
+          const host = this.getAttribute('data-host') || DEFAULT_HOST;
+          const width = this.getAttribute('data-width') || '100%';
+          const height = this.getAttribute('data-height') || '800px';
 
-    if (!window.customElements.get('docuseal-builder')) {
-      window.customElements.define('docuseal-builder', DummyBuilder);
-    }
+          if (!token) {
+            this.innerHTML = '<p style="color:red;">Error: data-token attribute is required</p>';
+            return;
+          }
 
-    if (!window.customElements.get('docuseal-form')) {
-      window.customElements.define('docuseal-form', DummyForm);
-    }
+          const iframe = document.createElement('iframe');
+          const params = new URLSearchParams({ token: token });
+          if (submissionId) params.set('submission_id', submissionId);
+          if (slug) params.set('slug', slug);
+          if (email) params.set('email', email);
+
+          iframe.src = host + '/embed/form?' + params.toString();
+          iframe.style.width = width;
+          iframe.style.height = height;
+          iframe.style.border = 'none';
+          iframe.setAttribute('allowfullscreen', 'true');
+
+          this.appendChild(iframe);
+
+          // Listen for postMessage events from iframe
+          window.addEventListener('message', function(event) {
+            if (event.source !== iframe.contentWindow) return;
+            if (!event.data || !event.data.type) return;
+            if (!event.data.type.startsWith('docuseal:')) return;
+
+            const customEvent = new CustomEvent(event.data.type, { detail: event.data.data });
+            this.dispatchEvent(customEvent);
+          }.bind(this));
+        }
+      }
+
+      if (!window.customElements.get('docuseal-builder')) {
+        window.customElements.define('docuseal-builder', DocuSealBuilder);
+      }
+
+      if (!window.customElements.get('docuseal-form')) {
+        window.customElements.define('docuseal-form', DocuSealForm);
+      }
+    })();
   JAVASCRIPT
 
   def show
     headers['Content-Type'] = 'application/javascript'
+    headers['Cache-Control'] = 'public, max-age=3600'
+    headers['Access-Control-Allow-Origin'] = '*'
 
-    self.response_body = DUMMY_SCRIPT
+    self.response_body = EMBED_SCRIPT
 
     self.status = 200
   end

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html data-theme="docuseal" lang="<%= I18n.locale %>">
+  <head>
+    <title>DocuSeal Embed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <%= csrf_meta_tags %>
+    <% pack = content_for?(:embed_pack) ? content_for(:embed_pack) : 'application' %>
+    <%= javascript_pack_tag pack, defer: true %>
+    <%= stylesheet_pack_tag pack, media: 'all' %>
+    <style>
+      body { margin: 0; padding: 0; overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <%= yield %>
+    <script>
+      // Post messages to parent window for embed events
+      window.DocuSealEmbed = {
+        postMessage: function(event, data) {
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: 'docuseal:' + event, data: data }, '*');
+          }
+        }
+      };
+    </script>
+  </body>
+</html>

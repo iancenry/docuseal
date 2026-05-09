@@ -5,9 +5,12 @@ services:
         condition: service_healthy
     image: docuseal/docuseal:latest
     ports:
-      - 3000:3000
+      - 4000:3000
     volumes:
       - ./docuseal:/data/docuseal
+      - ./app:/app/app
+      - ./lib:/app/lib
+      - ./config:/app/config
     environment:
       - FORCE_SSL=${HOST}
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/docuseal
@@ -21,7 +24,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: docuseal
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
       timeout: 5s
       retries: 5

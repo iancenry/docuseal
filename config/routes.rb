@@ -48,6 +48,7 @@ Rails.application.routes.draw do
       resources :form_events, only: %i[index], path: 'form/:type'
       resources :submission_events, only: %i[index], path: 'submission/:type'
     end
+    resources :embed_tokens, only: %i[create]
   end
 
   resources :verify_pdf_signature, only: %i[create]
@@ -213,6 +214,14 @@ Rails.application.routes.draw do
   match '/mcp', to: 'mcp#call', via: %i[get post]
 
   get '/js/:filename', to: 'embed_scripts#show', as: :embed_script
+
+  namespace :embed do
+    resource :builder, only: %i[show create]
+    resource :form, only: %i[show] do
+      get :completed
+      put ':slug', action: :update, as: :update
+    end
+  end
 
   ActiveSupport.run_load_hooks(:routes, self)
 end
