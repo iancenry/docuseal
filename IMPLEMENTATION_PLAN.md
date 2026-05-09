@@ -4,29 +4,77 @@
 
 | Feature                       | Pro Price | OSS Status                          | Effort  |
 | ----------------------------- | --------- | ----------------------------------- | ------- |
-| Company Logo / White-label    | $20/mo    | Placeholder only                    | Medium  |
+| Company Logo / White-label    | $20/mo    | **DONE** — upload + display         | Medium  |
 | Connect Own Email Address     | $20/mo    | **Already works** (SMTP settings)   | —       |
 | Personalized Email Content    | $20/mo    | **Already works** (email templates) | —       |
-| Automated Reminders           | $20/mo    | Config exists, no send job          | Low     |
+| Automated Reminders           | $20/mo    | **DONE** — job + scheduler          | Low     |
 | Zapier/Webhooks               | $20/mo    | **Already works** (webhooks exist)  | —       |
-| User Roles and Teams          | $20/mo    | Schema exists, only `admin` role    | Medium  |
+| User Roles and Teams          | $20/mo    | **DONE** — editor/viewer enabled    | Medium  |
 | Identity Verification via SMS | $20/mo    | Stub only, no provider code         | Medium  |
 | Bulk Send from Spreadsheet    | $20/mo    | Frontend exists, no backend         | Low-Med |
 | SSO / SAML                    | $20/mo    | Placeholder only                    | High    |
 | Accept Payments (Stripe)      | $20/mo    | Frontend exists, no backend         | Medium  |
-| Conditional Fields            | $20/mo    | **Full code hidden** by prop        | Trivial |
-| Formulas                      | $20/mo    | **Full code hidden** by prop        | Trivial |
+| Conditional Fields            | $20/mo    | **DONE** — prop enabled             | Trivial |
+| Formulas                      | $20/mo    | **DONE** — prop enabled             | Trivial |
 | API & Embedding               | $0.20/doc | Dummy JS served                     | High    |
 | HTML Template API             | $0.20/doc | No code exists                      | High    |
 | PDF/DOCX Field Tags API       | $0.20/doc | No code exists                      | Medium  |
 | Embedded Signing Form         | $0.20/doc | Dummy JS served                     | High    |
 | Embedded Form Builder         | $0.20/doc | Dummy JS served                     | High    |
 
+## Pro Gates Removed
+
+All Pro/Enterprise upsell barriers have been removed:
+
+- Placeholder banners (reminders, logo, SSO, SMS, API/embedding, bulk send)
+- UPGRADE button in header navbar
+- Plans/Pro link in settings sidebar
+- Enterprise API path blocking in errors controller
+- Disabled user role options (editor/viewer now selectable)
+- E-sign trusted signature button enabled
+- Ability permissions granted: `:reply_to`, `:personalization_advanced`, `:bulk_send`, `:disable_decline`, `:delegate_form`, `:saml_sso`, `:countless`, `:cfr`, `:download_users`, `:tenants`
+
+Note: Enterprise API paths (`/api/templates/html`, `/api/templates/pdf`, etc.) no longer show Pro paywall messages but will 404 until Phases 6-7 implement the actual controllers/routes.
+
+---
+
+## Testing Instructions
+
+### Phase 0 — Conditional Fields, Formulas, Phone, Payment
+
+1. Go to any template > Edit
+2. Add a field — Conditional Fields, Formula, Phone, and Payment field types should be available in the builder
+
+### Phase 1 — Automated Reminders
+
+1. Go to Settings > Notifications
+2. The "Unlock with DocuSeal Pro" banner should be gone
+3. Set a First/Second/Third reminder duration and Save
+4. Reminders fire automatically via Sidekiq every 15 minutes for pending submitters
+
+### Phase 2 — Company Logo
+
+1. Go to Settings > Personalization
+2. Scroll to "Company Logo" — upload dropzone should be visible (no Pro banner)
+3. Upload a logo image — preview with filename and Remove button should appear
+4. Send a signing request — the signing form should show your logo instead of DocuSeal logo
+5. Outgoing emails should include the logo at the top
+
+### Pro Gates Removed
+
+- Settings > Users > Invite new user — Editor and Viewer roles selectable (not grayed out)
+- UPGRADE button in header navbar — gone
+- Plans/Pro link in settings sidebar — gone
+- Settings > E-Signature — "DocuSeal Trusted Signature" Make Default button — enabled
+- Settings > SSO — Pro placeholder banner — gone
+- Settings > SMS — Pro placeholder banner — gone
+- Template > API & Embedding modal — Pro banner — gone
+
 ---
 
 ## Implementation Phases
 
-### Phase 0: Quick Wins (Trivial — just flip switches)
+### Phase 0: Quick Wins (Trivial — just flip switches) ✅ DONE
 
 These features have **full working code** that's just hidden by Vue props.
 
@@ -49,7 +97,7 @@ These features have **full working code** that's just hidden by Vue props.
 
 ---
 
-### Phase 1: Automated Reminders (Low effort)
+### Phase 1: Automated Reminders (Low effort) ✅ DONE
 
 The config system, UI, and event types already exist. We just need the background job.
 
@@ -71,7 +119,7 @@ The config system, UI, and event types already exist. We just need the backgroun
 
 ---
 
-### Phase 2: Company Logo & Branding (Medium effort)
+### Phase 2: Company Logo & Branding (Medium effort) ✅ DONE
 
 #### 2.1 Logo Upload Controller
 
@@ -88,7 +136,9 @@ The config system, UI, and event types already exist. We just need the backgroun
 
 ---
 
-### Phase 3: User Roles & Teams (Medium effort)
+### Phase 3: User Roles & Teams (Medium effort) ⚠️ PARTIAL
+
+Editor/Viewer roles are now selectable in the UI (Pro gate removed). Ability-based permission scoping for these roles still needs implementation in `lib/ability.rb`.
 
 #### 3.1 Define Roles
 

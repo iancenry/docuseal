@@ -20,6 +20,8 @@
 class Account < ApplicationRecord
   attribute :uuid, :string, default: -> { SecureRandom.uuid }
 
+  has_one_attached :company_logo
+
   has_many :users, dependent: :destroy
   has_many :encrypted_configs, dependent: :destroy
   has_many :account_configs, dependent: :destroy

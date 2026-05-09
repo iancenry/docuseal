@@ -143,6 +143,32 @@ class SubmitterMailer < ApplicationMailer
     end
   end
 
+  def invitation_reminder_email(submitter)
+    @current_account = submitter.submission.account
+    @submitter = submitter
+
+    @email_config = AccountConfigs.find_for_account(@current_account,
+                                                    AccountConfig::SUBMITTER_INVITATION_REMINDER_EMAIL_KEY)
+    @body = fetch_config_email_body(@email_config, @submitter)
+
+    assign_message_metadata('submitter_invitation_reminder', @submitter)
+
+    reply_to = build_submitter_reply_to(@submitter, email_config: @email_config)
+
+    maybe_set_custom_domain(@submitter)
+
+    I18n.with_locale(@current_account.locale) do
+      subject = build_invite_subject(nil, @email_config, submitter)
+
+      mail(
+        to: @submitter.friendly_name,
+        from: from_address_for_submitter(submitter),
+        subject:,
+        reply_to:
+      )
+    end
+  end
+
   def otp_verification_email(submitter, locale: nil)
     @submitter = submitter
     @otp_code = EmailVerificationCodes.generate([submitter.email.downcase.strip, submitter.slug].join(':'))

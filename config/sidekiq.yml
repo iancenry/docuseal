@@ -7,6 +7,13 @@ queues:
   - [recurrent, 1]
   - [rollbar, 1]
 
+:schedule:
+  send_submitter_reminders:
+    cron: '*/15 * * * *'
+    class: SendSubmitterReminderEmailJob
+    queue: recurrent
+    description: 'Check and send submitter reminder emails every 15 minutes'
+
 production:
   :concurrency: 15
   :max_retries: 3

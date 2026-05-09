@@ -14,16 +14,15 @@
         :height="30"
       />
       <span class="completed-form-message-title">
-        {{ completedMessage.title || (hasSignatureFields ? (hasMultipleDocuments ? t('documents_have_been_signed') : t('document_has_been_signed')) : t('form_has_been_completed')) }}
+        {{ completedMessage.title || (hasSignatureFields ? (hasMultipleDocuments ? t('documents_have_been_signed') :
+          t('document_has_been_signed')) : t('form_has_been_completed')) }}
       </span>
     </div>
     <div
       v-if="completedMessage.body"
       class="mt-2 completed-form-message-body"
     >
-      <MarkdownContent
-        :string="completedMessage.body"
-      />
+      <MarkdownContent :string="completedMessage.body" />
     </div>
     <div class="space-y-3 mt-5">
       <a
@@ -105,7 +104,8 @@
         href="https://www.docuseal.com/start"
         target="_blank"
         class="underline"
-      >DocuSeal</a> - {{ t('open_source_documents_software') }}
+      >OpenSeal</a> - {{
+        t('open_source_documents_software') }}
     </div>
   </div>
 </template>

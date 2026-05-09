@@ -6,6 +6,11 @@
     <style></style>
   </head>
   <body dir="<%= TextUtils.rtl?(yield) ? 'rtl' : 'auto' %>">
+    <% if @current_account&.company_logo&.attached? %>
+      <p style="text-align: center; margin-bottom: 16px;">
+        <%= image_tag polymorphic_url(@current_account.company_logo, host: ENV.fetch('EMAIL_HOST', Docuseal.default_url_options[:host])), style: 'max-height: 60px; max-width: 200px;', alt: @current_account.name %>
+      </p>
+    <% end %>
     <%= yield %>
     <%= render partial: 'shared/mailer_attribution' %>
   </body>

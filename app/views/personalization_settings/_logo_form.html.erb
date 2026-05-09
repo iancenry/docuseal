@@ -1,1 +1,38 @@
-<%= render 'logo_placeholder' %>
+<% if current_account.company_logo.attached? %>
+  <div class="flex items-center gap-4 p-4 bg-base-200 rounded-md mb-4">
+    <%= image_tag current_account.company_logo, class: 'h-16 object-contain' %>
+    <div class="flex flex-col gap-2">
+      <span class="text-sm font-medium"><%= current_account.company_logo.filename %></span>
+      <%= button_to t('remove'), settings_company_logo_path, method: :delete, class: 'btn btn-outline btn-error btn-sm', data: { turbo_confirm: t('are_you_sure_') } %>
+    </div>
+  </div>
+<% end %>
+<%= form_for '', url: settings_company_logo_path, method: :post, html: { enctype: 'multipart/form-data' } do %>
+  <button type="submit" class="hidden"></button>
+  <file-dropzone data-submit-on-upload="true" class="w-full">
+    <label for="logo_file" class="w-full block h-32 relative bg-base-200 hover:bg-base-200/70 rounded-md border border-base-content border-dashed cursor-pointer">
+      <div class="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center p-2">
+        <div class="flex flex-col items-center text-center">
+          <span data-target="file-dropzone.icon">
+            <%= svg_icon('cloud_upload', class: 'w-10 h-10') %>
+          </span>
+          <span data-target="file-dropzone.loading" class="hidden">
+            <%= svg_icon('loader', class: 'w-10 h-10 animate-spin') %>
+          </span>
+          <div class="font-medium mb-1">
+            <%= t('upload_logo') %>
+          </div>
+          <div class="text-xs">
+            <%= t('click_to_upload_or_drag_and_drop_files_html') %>
+          </div>
+        </div>
+        <input id="logo_file" name="logo" class="hidden" data-action="change:file-dropzone#onSelectFiles" data-target="file-dropzone.input" type="file" accept="image/png,image/jpeg,image/jpg,image/svg+xml">
+      </div>
+    </label>
+  </file-dropzone>
+  <div class="form-control mt-4">
+    <button type="submit" class="base-button">
+      <%= button_title(title: t('upload'), disabled_with: t('uploading')) %>
+    </button>
+  </div>
+<% end %>

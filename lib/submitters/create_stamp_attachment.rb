@@ -108,8 +108,14 @@ module Submitters
       end
     end
 
-    def load_logo(_submitter)
-      PdfIcons.stamp_logo_io
+    def load_logo(submitter)
+      account = submitter.account
+
+      if account.company_logo.attached?
+        StringIO.new(account.company_logo.download)
+      else
+        PdfIcons.stamp_logo_io
+      end
     end
   end
 end
