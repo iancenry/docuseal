@@ -66,7 +66,7 @@
     <%= render partial: 'templates/submission', collection: @submissions, locals: { with_template: true } %>
   </div>
 <% end %>
-<% if params[:q].blank? && params[:status].blank? && filter_params.blank? && @pagy.count.present? && @pagy.count < 5 %>
+<% if params[:q].blank? && params[:status].blank? && filter_params.blank? && @pagy.count.present? && @pagy.count < 5 && can?(:create, ::Template) %>
   <%= render 'templates/dropzone' %>
 <% end %>
 <% if @submissions.present? || (params[:q].blank? && filter_params.blank?) %>

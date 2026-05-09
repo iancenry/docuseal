@@ -2,10 +2,12 @@
 <% show_dropzone = params[:q].blank? && @pagy.pages == 1 && ((@template_folders.size < 10 && @templates.size.zero?) || (@template_folders.size < 7 && @templates.size < 4) || (@template_folders.size < 4 && @templates.size < 7)) %>
 <% if Docuseal.demo? %><%= render 'shared/demo_alert' %><% end %>
 <dashboard-dropzone>
-  <%= form_for '', url: '', id: form_id = SecureRandom.uuid, method: :post, class: 'hidden', data: { target: 'dashboard-dropzone.form' }, html: { enctype: 'multipart/form-data' } do %>
-    <input name="form_id" value="<%= form_id %>">
-    <button type="submit"></button>
-    <input id="dashboard_dropzone_input" name="files[]" type="file" multiple>
+  <% if can?(:create, ::Template) %>
+    <%= form_for '', url: '', id: form_id = SecureRandom.uuid, method: :post, class: 'hidden', data: { target: 'dashboard-dropzone.form' }, html: { enctype: 'multipart/form-data' } do %>
+      <input name="form_id" value="<%= form_id %>">
+      <button type="submit"></button>
+      <input id="dashboard_dropzone_input" name="files[]" type="file" multiple>
+    <% end %>
   <% end %>
   <div class="flex justify-between items-center w-full mb-4 relative">
     <% unless show_dropzone %>
@@ -81,7 +83,7 @@
     </div>
   <% end %>
 </dashboard-dropzone>
-<% if show_dropzone %>
+<% if show_dropzone && can?(:create, ::Template) %>
   <%= render 'templates/dropzone' %>
 <% end %>
 <% if @templates.present? || @template_folders.present? || params[:q].blank? %>

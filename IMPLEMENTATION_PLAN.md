@@ -70,6 +70,33 @@ Note: Enterprise API paths (`/api/templates/html`, `/api/templates/pdf`, etc.) n
 - Settings > SMS — Pro placeholder banner — gone
 - Template > API & Embedding modal — Pro banner — gone
 
+### Phase 3 — User Roles & Permissions
+
+**Setup:** Go to Settings > Users > Invite new user
+
+1. Create an **Editor** user (select "Editor" role) and a **Viewer** user (select "Viewer" role)
+2. Sign in as each user and verify:
+
+**Editor should:**
+
+- See templates dashboard, create/upload/edit/delete templates
+- Create and send submissions, archive submissions
+- See only Profile in Settings (no Account, Email, Storage, Users, API, Webhooks, SSO, MCP links)
+- NOT access account-level settings or manage other users
+
+**Viewer should:**
+
+- See templates dashboard (no upload button, no create button, no drag-drop upload)
+- View template details and submissions (read-only)
+- NOT see edit/archive/delete buttons on templates or submissions
+- NOT see the "Send" button in the template builder
+- See only Profile in Settings
+- NOT access any admin settings pages
+
+**Admin should:**
+
+- Full access — unchanged behavior from before
+
 ---
 
 ## Implementation Phases
@@ -136,24 +163,26 @@ The config system, UI, and event types already exist. We just need the backgroun
 
 ---
 
-### Phase 3: User Roles & Teams (Medium effort) ⚠️ PARTIAL
+### Phase 3: User Roles & Teams (Medium effort) ✅ DONE
 
-Editor/Viewer roles are now selectable in the UI (Pro gate removed). Ability-based permission scoping for these roles still needs implementation in `lib/ability.rb`.
+Editor/Viewer roles are fully implemented with ability-based permission scoping.
 
-#### 3.1 Define Roles
+#### 3.1 Define Roles ✅
 
 - **File**: `app/models/user.rb`
-- **Add roles**: `admin`, `manager`, `member`, `viewer`
+- **Roles**: `admin`, `editor`, `viewer` (added to `User::ROLES`)
+- **Helper methods**: `admin?`, `editor?`, `viewer?`
 - **Permissions**:
-  - `admin`: Full access (current behavior)
-  - `manager`: Create/send templates, manage team members
-  - `member`: Create/send templates, view own submissions only
-  - `viewer`: Read-only access to assigned submissions
+  - `admin`: Full access (unchanged)
+  - `editor`: Create/edit templates, create/send submissions, manage own profile — NO account settings, users, API keys, webhooks, SMTP, SSO, MCP
+  - `viewer`: Read-only access to templates and submissions, manage own profile — NO create/edit/delete
 
-#### 3.2 Update Ability System
+#### 3.2 Update Ability System ✅
 
 - **File**: `lib/ability.rb`
-- **Implement**: CanCanCan role-based rules per role
+- **Implemented**: Role-based `admin_abilities`, `editor_abilities`, `viewer_abilities` methods
+- **UI guards**: Settings nav hides admin-only items for editors/viewers
+- **View guards**: Dashboard dropzone, upload buttons, archive buttons respect `can?` checks
 
 #### 3.3 Teams (optional for multi-tenant HRMS)
 

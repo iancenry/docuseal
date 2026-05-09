@@ -48,7 +48,9 @@
 #
 class User < ApplicationRecord
   ROLES = [
-    ADMIN_ROLE = 'admin'
+    ADMIN_ROLE = 'admin',
+    EDITOR_ROLE = 'editor',
+    VIEWER_ROLE = 'viewer'
   ].freeze
 
   EMAIL_REGEXP = /[^@;,<>\s]+@[^@;,<>\s]+/
@@ -96,6 +98,18 @@ class User < ApplicationRecord
     return true if Rails.env.development?
 
     role == 'admin'
+  end
+
+  def admin?
+    role == ADMIN_ROLE
+  end
+
+  def editor?
+    role == EDITOR_ROLE
+  end
+
+  def viewer?
+    role == VIEWER_ROLE
   end
 
   def self.sign_in_after_reset_password
