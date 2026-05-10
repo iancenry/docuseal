@@ -29,6 +29,7 @@ class Ability
     can :manage, Submission, account_id: user.account_id
     can :manage, Submitter, account_id: user.account_id
     can :manage, User, account_id: user.account_id
+    can :manage, Team, account_id: user.account_id
     can :manage, EncryptedConfig, account_id: user.account_id
     can :manage, EncryptedUserConfig, user_id: user.id
     can :manage, AccountConfig, account_id: user.account_id

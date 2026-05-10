@@ -1,0 +1,66 @@
+<div class="flex-wrap space-y-4 md:flex md:flex-nowrap md:space-y-0 md:space-x-10">
+  <%= render 'shared/settings_nav' %>
+  <div class="md:flex-grow">
+    <div class="flex flex-col md:flex-row md:flex-wrap gap-2 md:justify-between md:items-end mb-4 min-h-12">
+      <h1 class="text-4xl font-bold">
+        <%= t('teams') %>
+      </h1>
+      <div class="flex flex-col md:flex-row gap-y-2 gap-x-4 md:items-center">
+        <% if can?(:create, Team.new(account: current_account)) %>
+          <%= link_to new_settings_team_path, class: 'btn btn-primary btn-md gap-2 w-full md:w-fit', data: { turbo_frame: 'modal' } do %>
+            <%= svg_icon('plus', class: 'w-6 h-6') %>
+            <span><%= t('new_team') %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table w-full table-lg rounded-b-none overflow-hidden">
+        <thead class="bg-base-200">
+          <tr class="text-neutral uppercase">
+            <th><%= t('name') %></th>
+            <th><%= t('members') %></th>
+            <th><%= t('description') %></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @teams.each do |team| %>
+            <tr>
+              <td class="font-medium"><%= team.name %></td>
+              <td>
+                <% member_count = team.users.active.count %>
+                <%= member_count %>
+              </td>
+              <td class="max-w-xs truncate text-sm text-neutral-500"><%= team.description %></td>
+              <td class="text-right">
+                <div class="flex items-center justify-end space-x-2">
+                  <%= link_to edit_settings_team_path(team), class: 'btn btn-sm btn-ghost', data: { turbo_frame: 'modal' } do %>
+                    <%= svg_icon('pencil', class: 'w-4 h-4') %>
+                  <% end %>
+                  <% if can?(:destroy, team) %>
+                    <%= button_to settings_team_path(team), method: :delete, class: 'btn btn-sm btn-ghost text-error', data: { turbo_confirm: t('are_you_sure_') } do %>
+                      <%= svg_icon('trash', class: 'w-4 h-4') %>
+                    <% end %>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+          <% if @teams.empty? %>
+            <tr>
+              <td colspan="4" class="text-center text-neutral-500 py-8">
+                <%= t('no_teams_yet') %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <% if @pagy.pages > 1 %>
+      <div class="flex justify-center mt-4">
+        <%== pagy_nav(@pagy) %>
+      </div>
+    <% end %>
+  </div>
+</div>

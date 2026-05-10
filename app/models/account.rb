@@ -23,6 +23,7 @@ class Account < ApplicationRecord
   has_one_attached :company_logo
 
   has_many :users, dependent: :destroy
+  has_many :teams, dependent: :destroy
   has_many :encrypted_configs, dependent: :destroy
   has_many :account_configs, dependent: :destroy
   has_many :email_messages, dependent: :destroy

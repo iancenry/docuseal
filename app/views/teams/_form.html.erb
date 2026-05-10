@@ -1,0 +1,35 @@
+<%= form_for team, url: team.persisted? ? settings_team_path(team) : settings_teams_path, html: { class: 'space-y-4' }, data: { turbo_frame: :_top } do |f| %>
+  <div class="space-y-2">
+    <div class="form-control">
+      <%= f.label :name, t('name'), class: 'label' %>
+      <%= f.text_field :name, required: true, class: 'base-input w-full', dir: 'auto' %>
+    </div>
+    <div class="form-control">
+      <%= f.label :description, t('description'), class: 'label' %>
+      <%= f.text_area :description, class: 'base-input w-full', rows: 3, dir: 'auto' %>
+    </div>
+    <% if team.persisted? %>
+      <div class="form-control">
+        <label class="label"><%= t('members') %></label>
+        <div class="space-y-2">
+          <% current_account.users.active.where.not(role: 'integration').order(:first_name, :email).each do |user| %>
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input type="checkbox" name="team[user_ids][]" value="<%= user.id %>"
+                     <%= 'checked' if user.team_id == team.id %>
+                     class="checkbox checkbox-sm" />
+              <span class="text-sm">
+                <%= user.full_name.presence || user.email %>
+                <% if user.full_name.present? %>
+                  <span class="text-neutral-500">(<%= user.email %>)</span>
+                <% end %>
+              </span>
+            </label>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="form-control pt-2">
+    <%= f.button button_title, class: 'base-button' %>
+  </div>
+<% end %>

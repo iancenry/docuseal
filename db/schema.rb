@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_16_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_10_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_catalog.plpgsql"
@@ -413,6 +413,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_16_100000) do
     t.index ["submission_id"], name: "index_submitters_on_submission_id"
   end
 
+  create_table "teams", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "name"], name: "index_teams_on_account_id_and_name", unique: true, where: "(archived_at IS NULL)"
+    t.index ["account_id"], name: "index_teams_on_account_id"
+  end
+
   create_table "template_accesses", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "template_id", null: false
@@ -505,6 +516,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_16_100000) do
     t.string "reset_password_token"
     t.string "role", null: false
     t.integer "sign_in_count", default: 0, null: false
+    t.bigint "team_id"
     t.string "unconfirmed_email"
     t.string "unlock_token"
     t.datetime "updated_at", null: false
@@ -512,6 +524,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_16_100000) do
     t.index ["account_id"], name: "index_users_on_account_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["team_id"], name: "index_users_on_team_id"
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
     t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
@@ -581,6 +594,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_16_100000) do
   add_foreign_key "submissions", "users", column: "created_by_user_id"
   add_foreign_key "submitter_versions", "submitters"
   add_foreign_key "submitters", "submissions"
+  add_foreign_key "teams", "accounts"
   add_foreign_key "template_accesses", "templates"
   add_foreign_key "template_folders", "accounts"
   add_foreign_key "template_folders", "template_folders", column: "parent_folder_id"
@@ -591,5 +605,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_16_100000) do
   add_foreign_key "templates", "users", column: "author_id"
   add_foreign_key "user_configs", "users"
   add_foreign_key "users", "accounts"
+  add_foreign_key "users", "teams"
   add_foreign_key "webhook_urls", "accounts"
 end

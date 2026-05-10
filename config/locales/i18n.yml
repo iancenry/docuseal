@@ -543,8 +543,15 @@ en: &en
   edit_account: Edit Account
   new_team: New Team
   new_tenant: New Tenant
+  edit_team: Edit Team
   remove_team: Remove Team
   remove_tenant: Remove Tenant
+  team_has_been_created: Team has been created
+  team_has_been_updated: Team has been updated
+  team_has_been_removed: Team has been removed
+  no_teams_yet: No teams yet
+  description: Description
+  members: Members
   replace: Replace
   allow_tenant_admins_to_invite_new_users: Allow tenant admins to invite new users
   manage_multiple_teams: Manage Multiple Teams

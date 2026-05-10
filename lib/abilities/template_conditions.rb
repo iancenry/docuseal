@@ -7,6 +7,12 @@ module Abilities
     def collection(user, ability: nil)
       templates = Template.where(account_id: user.account_id)
 
+      # Scope by team for non-admin users with a team assigned
+      if user.team_id.present? && !user.admin?
+        team_user_ids = User.where(team_id: user.team_id, account_id: user.account_id).select(:id)
+        templates = templates.where(author_id: team_user_ids)
+      end
+
       return templates unless user.account.testing?
 
       shared_ids =
@@ -18,7 +24,16 @@ module Abilities
 
     def entity(template, user:, ability: nil)
       return true if template.account_id.blank?
-      return true if template.account_id == user.account_id
+
+      if template.account_id == user.account_id
+        # Enforce team scoping for non-admin users with a team
+        if user.team_id.present? && !user.admin?
+          team_user_ids = User.where(team_id: user.team_id, account_id: user.account_id).pluck(:id)
+          return team_user_ids.include?(template.author_id)
+        end
+
+        return true
+      end
       return false unless user.account.linked_account_account
       return false if template.template_sharings.to_a.blank?
 

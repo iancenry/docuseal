@@ -33,18 +33,21 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  account_id             :bigint           not null
+#  team_id                :bigint
 #
 # Indexes
 #
 #  index_users_on_account_id            (account_id)
 #  index_users_on_email                 (email) UNIQUE
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
+#  index_users_on_team_id               (team_id)
 #  index_users_on_unlock_token          (unlock_token) UNIQUE
 #  index_users_on_uuid                  (uuid) UNIQUE
 #
 # Foreign Keys
 #
 #  fk_rails_...  (account_id => accounts.id)
+#  fk_rails_...  (team_id => teams.id)
 #
 class User < ApplicationRecord
   ROLES = [
@@ -62,6 +65,7 @@ class User < ApplicationRecord
   has_one_attached :initials
 
   belongs_to :account
+  belongs_to :team, optional: true
   has_one :access_token, dependent: :destroy
   has_many :access_tokens, dependent: :destroy
   has_many :mcp_tokens, dependent: :destroy
