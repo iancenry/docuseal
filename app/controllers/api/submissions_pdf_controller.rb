@@ -28,6 +28,8 @@ module Api
 
       raise if Rails.env.local?
 
+      template&.destroy rescue nil # rubocop:disable Style/RescueModifier
+
       render json: { error: 'Failed to create submission from PDF' }, status: :unprocessable_content
     end
 
@@ -144,6 +146,9 @@ module Api
 
       template.save!
       temp_template.destroy
+    rescue StandardError
+      temp_template&.destroy rescue nil # rubocop:disable Style/RescueModifier
+      raise
     end
 
     def apply_field_overrides(template, documents)
@@ -161,14 +166,16 @@ module Api
           submitter_uuid = submitter&.dig('uuid') || template.submitters.first&.dig('uuid')
 
           areas = field_param[:areas].map do |area|
+            attachment_uuid = template.schema.dig(0, 'attachment_uuid')
+
             {
               'x' => area[:x].to_f,
               'y' => area[:y].to_f,
               'w' => area[:w].to_f,
               'h' => area[:h].to_f,
               'page' => (area[:page].to_i - 1), # API uses 1-based, internal uses 0-based
-              'attachment_uuid' => template.schema.dig(0, 'attachment_uuid')
-            }
+              'attachment_uuid' => attachment_uuid
+            }.compact
           end
 
           existing = template.fields.find { |f| f['name'] == field_name }

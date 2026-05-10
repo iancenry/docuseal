@@ -28,6 +28,8 @@ module Api
 
       raise if Rails.env.local?
 
+      template&.destroy rescue nil # rubocop:disable Style/RescueModifier
+
       render json: { error: 'Failed to create submission from DOCX' }, status: :unprocessable_content
     end
 
@@ -147,6 +149,9 @@ module Api
 
       template.save!
       temp_template.destroy
+    rescue StandardError
+      temp_template&.destroy rescue nil # rubocop:disable Style/RescueModifier
+      raise
     end
 
     def create_submissions_from_template(template)
