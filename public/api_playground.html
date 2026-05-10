@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Playground — OpenSeal</title>
+    <style>
+        :root {
+            --primary: #6d28d9;
+            --primary-hover: #5b21b6;
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #111827;
+            --text-muted: #6b7280;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --error: #dc2626;
+            --error-bg: #fef2f2;
+            --radius: 10px;
+            --radius-sm: 6px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 16px;
+        }
+
+        .header-links a {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .header-links a:hover {
+            color: var(--primary);
+        }
+
+        .layout {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            background: none;
+            transition: all 0.15s;
+        }
+
+        .tab:hover {
+            color: var(--text);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text);
+            background: var(--surface);
+            outline: none;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
+        }
+
+        textarea {
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 13px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            background: var(--primary);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-post {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-path {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: var(--text-muted);
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--primary);
+            background: rgba(109, 40, 217, 0.03);
+        }
+
+        .drop-zone .file-name {
+            margin-top: 8px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .drop-zone input[type="file"] {
+            display: none;
+        }
+
+        .response-box {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .response-box.visible {
+            display: block;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .response-status {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .response-status.success {
+            color: var(--success);
+        }
+
+        .response-status.error {
+            color: var(--error);
+        }
+
+        .response-body {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            max-height: 500px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .tag-help {
+            background: #f9fafb;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+
+        .tag-help code {
+            background: #ede9fe;
+            color: #5b21b6;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .badge-get {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .field-value-input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text);
+            background: var(--surface);
+            outline: none;
+        }
+
+        .field-value-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-inner">
+            <h1>API Playground</h1>
+            <div class="header-links">
+                <a href="/">← Dashboard</a>
+                <a href="/settings/api">API Settings</a>
+                <a href="/embed_test.html">Embed Playground</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="layout">
+        <!-- API Token -->
+        <div class="card">
+            <div class="form-group" style="margin-bottom:0">
+                <label>API Token (X-Auth-Token)</label>
+                <input type="password" id="apiToken" placeholder="Paste your API token from Settings > API">
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="html">
+                HTML Template
+            </button>
+            <button class="tab" data-tab="pdf">
+                PDF with Tags
+            </button>
+            <button class="tab" data-tab="docx">
+                DOCX / DOC with Tags
+            </button>
+            <button class="tab" data-tab="submit">
+                Fill &amp; Send
+            </button>
+        </div>
+
+        <!-- HTML Tab -->
+        <div id="tab-html" class="tab-panel active">
+            <div class="card">
+                <div class="card-title">Create Template from HTML</div>
+                <div style="margin-bottom:12px">
+                    <span class="badge badge-post">POST</span>
+                    <span class="badge badge-path">/api/templates/html</span>
+                </div>
+                <div class="tag-help">
+                    <strong>Tag syntax:</strong>
+                    <code>{{Field Name}}</code>
+                    <code>{{Field Name|type}}</code>
+                    <code>{{Field Name|select|Opt1,Opt2}}</code><br>
+                    Types: text, signature, initials, date, image, checkbox, select, number, phone, file
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Template Name</label>
+                        <input type="text" id="htmlName" value="HTML Test Template">
+                    </div>
+                    <div class="form-group">
+                        <label>Custom CSS (optional)</label>
+                        <input type="text" id="htmlCss" placeholder="h1 { color: #2563eb; }">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>HTML Content</label>
+                    <textarea id="htmlBody" rows="12">&lt;h1&gt;Employment Agreement&lt;/h1&gt;
+
+&lt;p&gt;This agreement is entered into by &lt;strong&gt;{{Full Name}}&lt;/strong&gt;,
+holding the position of &lt;strong&gt;{{Job Title}}&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Department: {{Department|select|Engineering,Marketing,Sales,HR}}&lt;/p&gt;
+&lt;p&gt;Start Date: {{Start Date|date}}&lt;/p&gt;
+
+&lt;h2&gt;Terms&lt;/h2&gt;
+&lt;p&gt;The employee agrees to the terms and conditions outlined in the company handbook.&lt;/p&gt;
+
+&lt;p&gt;{{I Agree to Terms|checkbox}}&lt;/p&gt;
+
+&lt;p&gt;Signature: {{Signature|signature}}&lt;/p&gt;</textarea>
+                </div>
+                <button class="btn" onclick="submitHtml()">
+                    <span id="htmlBtnText">Create Template</span>
+                </button>
+                <div id="htmlResponse" class="response-box">
+                    <div class="response-header">
+                        <span id="htmlStatus" class="response-status"></span>
+                    </div>
+                    <pre class="response-body" id="htmlResult"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF Tab -->
+        <div id="tab-pdf" class="tab-panel">
+            <div class="card">
+                <div class="card-title">Create Template from Tagged PDF</div>
+                <div style="margin-bottom:12px">
+                    <span class="badge badge-post">POST</span>
+                    <span class="badge badge-path">/api/templates/pdf</span>
+                </div>
+                <div class="tag-help">
+                    Upload a PDF that contains <code>{{tags}}</code> in its text layer.
+                    Tags are detected, positioned, and removed from the final document.
+                </div>
+                <div class="form-group">
+                    <label>Template Name</label>
+                    <input type="text" id="pdfName" value="PDF Tags Test">
+                </div>
+                <div class="form-group">
+                    <label>PDF File</label>
+                    <div class="drop-zone" id="pdfDropZone" onclick="document.getElementById('pdfFile').click()">
+                        <div>Drop a PDF here or <strong>click to browse</strong></div>
+                        <div class="file-name" id="pdfFileName"></div>
+                        <input type="file" id="pdfFile" accept=".pdf,application/pdf">
+                    </div>
+                </div>
+                <button class="btn" onclick="submitPdf()">
+                    <span id="pdfBtnText">Create Template</span>
+                </button>
+                <div id="pdfResponse" class="response-box">
+                    <div class="response-header">
+                        <span id="pdfStatus" class="response-status"></span>
+                    </div>
+                    <pre class="response-body" id="pdfResult"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOCX Tab -->
+        <div id="tab-docx" class="tab-panel">
+            <div class="card">
+                <div class="card-title">Create Template from Tagged DOCX / DOC</div>
+                <div style="margin-bottom:12px">
+                    <span class="badge badge-post">POST</span>
+                    <span class="badge badge-path">/api/templates/docx</span>
+                </div>
+                <div class="tag-help">
+                    Upload a <strong>DOCX</strong> or <strong>DOC</strong> file. DOCX files can contain
+                    <code>{{tags}}</code> for auto field detection.
+                    DOC files will be converted to PDF but tags cannot be auto-extracted (add fields manually).
+                    Requires <strong>Gotenberg</strong> running for conversion.
+                </div>
+                <div class="form-group">
+                    <label>Template Name</label>
+                    <input type="text" id="docxName" value="DOCX Tags Test">
+                </div>
+                <div class="form-group">
+                    <label>DOCX / DOC File</label>
+                    <div class="drop-zone" id="docxDropZone" onclick="document.getElementById('docxFile').click()">
+                        <div>Drop a DOCX or DOC file here or <strong>click to browse</strong></div>
+                        <div class="file-name" id="docxFileName"></div>
+                        <input type="file" id="docxFile"
+                            accept=".docx,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword">
+                    </div>
+                </div>
+                <button class="btn" onclick="submitDocx()">
+                    <span id="docxBtnText">Create Template</span>
+                </button>
+                <div id="docxResponse" class="response-box">
+                    <div class="response-header">
+                        <span id="docxStatus" class="response-status"></span>
+                    </div>
+                    <pre class="response-body" id="docxResult"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fill & Send Tab -->
+        <div id="tab-submit" class="tab-panel">
+            <div class="card">
+                <div class="card-title">Fill Template &amp; Send for Signing</div>
+                <div style="margin-bottom:12px">
+                    <span class="badge badge-post">POST</span>
+                    <span class="badge badge-path">/api/submissions</span>
+                </div>
+                <div class="tag-help">
+                    Select an existing template, pre-fill field values, and send for signing.
+                    The signer receives an email with a link to review and sign the document.
+                </div>
+
+                <!-- Step 1: Load template -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Template</label>
+                        <select id="submitTemplateId"
+                            style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--surface)">
+                            <option value="">— Loading templates… —</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display:flex;align-items:flex-end">
+                        <button class="btn" onclick="loadTemplate()" style="width:100%">
+                            <span id="loadBtnText">Load Fields</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="templateInfo" style="display:none">
+                    <!-- Template name -->
+                    <div class="tag-help" id="templateNameInfo" style="margin-top:8px"></div>
+
+                    <!-- Submitter info -->
+                    <div class="form-row" style="margin-top:16px">
+                        <div class="form-group">
+                            <label>Signer Email</label>
+                            <input type="text" id="submitEmail" placeholder="signer@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Signer Name (optional)</label>
+                            <input type="text" id="submitName" placeholder="John Doe">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label
+                            style="display:flex;align-items:center;gap:8px;text-transform:none;font-size:14px;letter-spacing:0">
+                            <input type="checkbox" id="submitSendEmail" checked style="width:auto">
+                            Send email notification to signer
+                        </label>
+                    </div>
+
+                    <!-- Dynamic fields -->
+                    <div class="form-group">
+                        <label>Pre-fill Field Values</label>
+                        <div class="tag-help" style="margin-bottom:8px">
+                            Leave blank to let the signer fill in. Pre-filled values appear as defaults on the signing
+                            form.
+                        </div>
+                        <div id="fieldsList"></div>
+                    </div>
+
+                    <button class="btn" onclick="submitSubmission()" style="margin-top:8px">
+                        <span id="submitBtnText">Send for Signing</span>
+                    </button>
+
+                    <!-- Signing link -->
+                    <div id="signingLink" class="tag-help" style="display:none;margin-top:16px">
+                        <strong>Signing URL:</strong>
+                        <a id="signingLinkUrl" href="#" target="_blank"
+                            style="color:var(--primary);word-break:break-all"></a>
+                    </div>
+                </div>
+
+                <div id="submitResponse" class="response-box">
+                    <div class="response-header">
+                        <span id="submitStatus" class="response-status"></span>
+                    </div>
+                    <pre class="response-body" id="submitResult"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+
+                if (tab.dataset.tab === 'submit') fetchTemplatesList();
+            });
+        });
+
+        // Auto-load fields when template is selected from dropdown
+        document.getElementById('submitTemplateId').addEventListener('change', () => {
+            if (document.getElementById('submitTemplateId').value) loadTemplate();
+        });
+
+        // Reset template list cache when token changes
+        document.getElementById('apiToken').addEventListener('input', () => { templatesLoaded = false; });
+
+        // Drag & drop
+        function setupDropZone(zoneId, inputId, nameId) {
+            const zone = document.getElementById(zoneId);
+            const input = document.getElementById(inputId);
+            const nameEl = document.getElementById(nameId);
+
+            input.addEventListener('change', () => {
+                if (input.files[0]) nameEl.textContent = input.files[0].name;
+            });
+
+            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                if (e.dataTransfer.files[0]) {
+                    input.files = e.dataTransfer.files;
+                    nameEl.textContent = e.dataTransfer.files[0].name;
+                }
+            });
+        }
+        setupDropZone('pdfDropZone', 'pdfFile', 'pdfFileName');
+        setupDropZone('docxDropZone', 'docxFile', 'docxFileName');
+
+        function getToken() {
+            const token = document.getElementById('apiToken').value.trim();
+            if (!token) {
+                alert('Please enter your API token. You can find it at Settings > API.');
+                return null;
+            }
+            return token;
+        }
+
+        function showResult(prefix, status, ok, body) {
+            const el = document.getElementById(prefix + 'Response');
+            const statusEl = document.getElementById(prefix + 'Status');
+            const resultEl = document.getElementById(prefix + 'Result');
+
+            el.classList.add('visible');
+            statusEl.textContent = ok ? `✓ ${status} Created` : `✗ ${status} Error`;
+            statusEl.className = 'response-status ' + (ok ? 'success' : 'error');
+            resultEl.textContent = body;
+        }
+
+        function setLoading(prefix, loading) {
+            const btn = document.getElementById(prefix + 'BtnText');
+            btn.innerHTML = loading ? '<span class="spinner"></span> Creating…' : 'Create Template';
+            btn.closest('button').disabled = loading;
+        }
+
+        // HTML
+        async function submitHtml() {
+            const token = getToken(); if (!token) return;
+            setLoading('html', true);
+
+            try {
+                const res = await fetch('/api/templates/html', {
+                    method: 'POST',
+                    headers: { 'X-Auth-Token': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        html: document.getElementById('htmlBody').value,
+                        name: document.getElementById('htmlName').value,
+                        css: document.getElementById('htmlCss').value || undefined
+                    })
+                });
+                const data = await res.json();
+                showResult('html', res.status, res.ok, JSON.stringify(data, null, 2));
+            } catch (e) {
+                showResult('html', 0, false, 'Network error: ' + e.message);
+            }
+            setLoading('html', false);
+        }
+
+        // PDF
+        async function submitPdf() {
+            const token = getToken(); if (!token) return;
+            const file = document.getElementById('pdfFile').files[0];
+            if (!file) { alert('Please select a PDF file.'); return; }
+
+            setLoading('pdf', true);
+            const form = new FormData();
+            form.append('file', file);
+            form.append('name', document.getElementById('pdfName').value);
+
+            try {
+                const res = await fetch('/api/templates/pdf', {
+                    method: 'POST',
+                    headers: { 'X-Auth-Token': token },
+                    body: form
+                });
+                const data = await res.json();
+                showResult('pdf', res.status, res.ok, JSON.stringify(data, null, 2));
+            } catch (e) {
+                showResult('pdf', 0, false, 'Network error: ' + e.message);
+            }
+            setLoading('pdf', false);
+        }
+
+        // DOCX
+        async function submitDocx() {
+            const token = getToken(); if (!token) return;
+            const file = document.getElementById('docxFile').files[0];
+            if (!file) { alert('Please select a DOCX file.'); return; }
+
+            setLoading('docx', true);
+            const form = new FormData();
+            form.append('file', file);
+            form.append('name', document.getElementById('docxName').value);
+
+            try {
+                const res = await fetch('/api/templates/docx', {
+                    method: 'POST',
+                    headers: { 'X-Auth-Token': token },
+                    body: form
+                });
+                const data = await res.json();
+                showResult('docx', res.status, res.ok, JSON.stringify(data, null, 2));
+            } catch (e) {
+                showResult('docx', 0, false, 'Network error: ' + e.message);
+            }
+            setLoading('docx', false);
+        }
+
+        // Load template fields
+        let loadedTemplate = null;
+        let templatesLoaded = false;
+
+        async function fetchTemplatesList() {
+            if (templatesLoaded) return;
+            const token = document.getElementById('apiToken').value.trim();
+            if (!token) return;
+
+            const select = document.getElementById('submitTemplateId');
+            select.innerHTML = '<option value="">— Loading… —</option>';
+
+            try {
+                const res = await fetch('/api/templates', {
+                    headers: { 'X-Auth-Token': token }
+                });
+                const data = await res.json();
+
+                select.innerHTML = '<option value="">— Select a template —</option>';
+
+                if (Array.isArray(data.data || data)) {
+                    const list = data.data || data;
+                    list.forEach(t => {
+                        const opt = document.createElement('option');
+                        opt.value = t.id;
+                        opt.textContent = '#' + t.id + ' — ' + (t.name || 'Untitled') + ' (' + (t.fields || []).length + ' fields)';
+                        select.appendChild(opt);
+                    });
+                }
+                templatesLoaded = true;
+            } catch (e) {
+                select.innerHTML = '<option value="">— Failed to load —</option>';
+            }
+        }
+
+        async function loadTemplate() {
+            const token = getToken(); if (!token) return;
+            const templateId = document.getElementById('submitTemplateId').value.trim();
+            if (!templateId) { alert('Enter a template ID'); return; }
+
+            const btn = document.getElementById('loadBtnText');
+            btn.innerHTML = '<span class="spinner"></span> Loading…';
+            btn.closest('button').disabled = true;
+
+            try {
+                const res = await fetch('/api/templates/' + encodeURIComponent(templateId), {
+                    headers: { 'X-Auth-Token': token }
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alert('Failed to load template: ' + (data.error || res.status));
+                    btn.textContent = 'Load Template Fields';
+                    btn.closest('button').disabled = false;
+                    return;
+                }
+
+                loadedTemplate = data;
+
+                // Show template info
+                const info = document.getElementById('templateNameInfo');
+                info.innerHTML = '<strong>Template:</strong> ' + escapeHtml(data.name) +
+                    ' (ID: ' + data.id + ') — <strong>' + (data.fields || []).length + ' fields</strong>' +
+                    ', Role: <code>' + escapeHtml((data.submitters || [{}])[0].name || 'First Party') + '</code>';
+
+                // Build field inputs
+                const container = document.getElementById('fieldsList');
+                container.innerHTML = '';
+
+                const fields = data.fields || [];
+                if (fields.length === 0) {
+                    container.innerHTML = '<div style="color:var(--text-muted);font-size:13px">No fields found in this template.</div>';
+                } else {
+                    const grid = document.createElement('div');
+                    grid.className = 'form-row';
+                    grid.style.gap = '12px';
+
+                    fields.forEach(f => {
+                        const group = document.createElement('div');
+                        group.className = 'form-group';
+                        group.style.marginBottom = '0';
+
+                        const label = document.createElement('label');
+                        label.style.textTransform = 'none';
+                        label.style.letterSpacing = '0';
+                        label.style.fontSize = '13px';
+                        label.innerHTML = escapeHtml(f.name) + ' <span style="color:var(--text-muted);font-size:11px">(' + f.type + ')</span>';
+
+                        let input;
+                        if (f.type === 'select' && f.options && f.options.length > 0) {
+                            input = document.createElement('select');
+                            input.style.cssText = 'width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--surface)';
+                            const emptyOpt = document.createElement('option');
+                            emptyOpt.value = '';
+                            emptyOpt.textContent = '— leave empty —';
+                            input.appendChild(emptyOpt);
+                            f.options.forEach(o => {
+                                const opt = document.createElement('option');
+                                opt.value = o.value;
+                                opt.textContent = o.value;
+                                input.appendChild(opt);
+                            });
+                        } else if (f.type === 'date') {
+                            input = document.createElement('input');
+                            input.type = 'date';
+                        } else if (f.type === 'checkbox') {
+                            input = document.createElement('select');
+                            input.style.cssText = 'width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--surface)';
+                            ['', 'true', 'false'].forEach(v => {
+                                const opt = document.createElement('option');
+                                opt.value = v;
+                                opt.textContent = v === '' ? '— leave empty —' : v;
+                                input.appendChild(opt);
+                            });
+                        } else if (f.type === 'signature' || f.type === 'initials' || f.type === 'image' || f.type === 'stamp' || f.type === 'file') {
+                            input = document.createElement('input');
+                            input.type = 'text';
+                            input.placeholder = 'Cannot pre-fill ' + f.type + ' fields';
+                            input.disabled = true;
+                            input.style.opacity = '0.5';
+                        } else {
+                            input = document.createElement('input');
+                            input.type = 'text';
+                            input.placeholder = 'Enter value…';
+                        }
+
+                        input.dataset.fieldName = f.name;
+                        input.dataset.fieldType = f.type;
+                        input.className = 'field-value-input';
+
+                        group.appendChild(label);
+                        group.appendChild(input);
+                        grid.appendChild(group);
+                    });
+
+                    container.appendChild(grid);
+                }
+
+                document.getElementById('templateInfo').style.display = 'block';
+                document.getElementById('signingLink').style.display = 'none';
+            } catch (e) {
+                alert('Network error: ' + e.message);
+            }
+
+            btn.textContent = 'Load Fields';
+            btn.closest('button').disabled = false;
+        }
+
+        // Submit submission
+        async function submitSubmission() {
+            const token = getToken(); if (!token) return;
+            if (!loadedTemplate) { alert('Load a template first'); return; }
+
+            const email = document.getElementById('submitEmail').value.trim();
+            if (!email) { alert('Signer email is required'); return; }
+
+            const btn = document.getElementById('submitBtnText');
+            btn.innerHTML = '<span class="spinner"></span> Sending…';
+            btn.closest('button').disabled = true;
+
+            // Collect field values
+            const values = {};
+            document.querySelectorAll('.field-value-input').forEach(input => {
+                const val = input.value.trim();
+                if (val && !input.disabled) {
+                    const name = input.dataset.fieldName;
+                    if (input.dataset.fieldType === 'checkbox') {
+                        values[name] = val === 'true';
+                    } else {
+                        values[name] = val;
+                    }
+                }
+            });
+
+            const role = (loadedTemplate.submitters || [{}])[0].name || 'First Party';
+            const payload = {
+                template_id: loadedTemplate.id,
+                send_email: document.getElementById('submitSendEmail').checked,
+                submitters: [{
+                    role: role,
+                    email: email,
+                    name: document.getElementById('submitName').value.trim() || undefined,
+                    values: Object.keys(values).length > 0 ? values : undefined
+                }]
+            };
+
+            try {
+                const res = await fetch('/api/submissions', {
+                    method: 'POST',
+                    headers: { 'X-Auth-Token': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                showResult('submit', res.status, res.ok, JSON.stringify(data, null, 2));
+
+                // Show signing link
+                if (res.ok && data.submitters && data.submitters[0]) {
+                    const slug = data.submitters[0].slug;
+                    if (slug) {
+                        const url = window.location.origin + '/s/' + slug;
+                        const linkEl = document.getElementById('signingLinkUrl');
+                        linkEl.href = url;
+                        linkEl.textContent = url;
+                        document.getElementById('signingLink').style.display = 'block';
+                    }
+                }
+            } catch (e) {
+                showResult('submit', 0, false, 'Network error: ' + e.message);
+            }
+
+            btn.textContent = 'Send for Signing';
+            btn.closest('button').disabled = false;
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+    </script>
+</body>
+
+</html>

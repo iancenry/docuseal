@@ -50,6 +50,8 @@ class SubmissionsController < ApplicationController
                                        mark_as_sent: params[:send_email] == '1',
                                        emails: params[:emails],
                                        params: params.merge('send_completed_email' => true))
+      elsif params[:submissions_json].present?
+        create_submissions(@template, spreadsheet_submissions_params, params)
       else
         create_submissions(@template, submissions_params, params)
       end
@@ -110,6 +112,31 @@ class SubmissionsController < ApplicationController
 
   def submissions_params
     params.permit(submission: { submitters: [:uuid, :email, :phone, :name, { values: {} }] })
+  end
+
+  def spreadsheet_submissions_params
+    parsed = JSON.parse(params[:submissions_json])
+    submission_hash = {}
+
+    parsed.each_with_index do |entry, index|
+      submitters = Array.wrap(entry['submitters']).map do |s|
+        {
+          uuid: s['uuid'],
+          role: s['role'],
+          email: s['email'],
+          name: s['name'],
+          phone: s['phone'],
+          external_id: s['external_id'],
+          fields: Array.wrap(s['fields']).map do |f|
+            { name: f['name'], default_value: f['default_value'], readonly: f['readonly'] }.with_indifferent_access
+          end
+        }.compact_blank.with_indifferent_access
+      end
+
+      submission_hash[index.to_s] = { submitters: }
+    end
+
+    { submission: submission_hash }
   end
 
   def load_template

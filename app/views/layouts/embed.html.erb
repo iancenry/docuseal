@@ -12,8 +12,76 @@
       body { margin: 0; padding: 0; overflow: auto; }
     </style>
   </head>
-  <body>
+  <body data-turbo="false">
     <%= yield %>
+    <script>
+      // ---- Embed Navigation Guard ----
+      // Prevents the iframe from navigating away from /embed/ routes.
+      // The builder Vue component navigates to /templates/:id after save —
+      // we must block ALL navigation methods including window.location.href assignment.
+
+      function isAllowedUrl(url) {
+        try {
+          var u = (url instanceof URL) ? url : new URL(url, window.location.origin);
+          var p = u.pathname;
+          return p.startsWith('/embed/') || p.startsWith('/disk/') || p.startsWith('/rails/') || p.startsWith('/s/') || p.startsWith('/api/') || p.startsWith('/send_submission_email') || p.startsWith('/submitters/') || p.startsWith('/file/');
+        } catch(e) { return false; }
+      }
+
+      // PRIMARY: Navigation API — catches everything including window.location.href =
+      // Supported in Chrome 102+, Edge 102+, Opera 88+ (covers ~75% of browsers)
+      if (window.navigation) {
+        window.navigation.addEventListener('navigate', function(e) {
+          if (!e.canIntercept) return;
+          if (!isAllowedUrl(e.destination.url)) {
+            e.preventDefault();
+          }
+        });
+      }
+
+      // FALLBACK 1: Block link clicks (for Safari and older browsers)
+      document.addEventListener('click', function(e) {
+        var link = e.target.closest('a[href]');
+        if (!link) return;
+        var href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('blob:') || href.startsWith('data:')) return;
+        if (link.target === '_blank') return;
+        if (!isAllowedUrl(href)) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+        }
+      }, true);
+
+      // FALLBACK 2: Block form submissions
+      document.addEventListener('submit', function(e) {
+        var action = e.target.getAttribute('action') || '';
+        if (action && !action.startsWith('#') && !isAllowedUrl(action)) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+        }
+      }, true);
+
+      // FALLBACK 3: Block Turbo visits
+      document.addEventListener('turbo:before-visit', function(e) {
+        if (e.detail && e.detail.url && !isAllowedUrl(e.detail.url)) {
+          e.preventDefault();
+        }
+      });
+
+      // FALLBACK 4: Block history API
+      (function() {
+        var origPush = history.pushState;
+        var origReplace = history.replaceState;
+        history.pushState = function(state, title, url) {
+          if (url && !isAllowedUrl(url)) return;
+          return origPush.apply(this, arguments);
+        };
+        history.replaceState = function(state, title, url) {
+          if (url && !isAllowedUrl(url)) return;
+          return origReplace.apply(this, arguments);
+        };
+      })();
+    </script>
     <script>
       // Post messages to parent window for embed events
       window.DocuSealEmbed = {

@@ -1,1 +1,10 @@
-
+<%= form_for '', url: template_submissions_path(template), html: { class: 'space-y-4', autocomplete: 'off' }, data: { turbo_frame: :_top } do |f| %>
+  <import-list data-template="<%= { name: template.name, submitters: template.submitters, fields: template.fields }.to_json %>" data-multitenant="<%= Docuseal.multitenant? %>" data-i18n="<%= t('import_list').to_json %>"></import-list>
+  <div>
+    <%= render 'send_email', f:, template: %>
+    <%= render 'extra_fields', f: %>
+  </div>
+  <div id="list_form_buttons" class="form-control hidden">
+    <%= f.button button_title(title: t('add_recipients')), class: 'base-button' %>
+  </div>
+<% end %>

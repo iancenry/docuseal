@@ -59,6 +59,14 @@
           </li>
         <% end %>
       <% end %>
+      <% if !Docuseal.multitenant? && can?(:read, AccessToken) %>
+        <li>
+          <%= link_to 'Embed Playground', '/embed_test.html', class: 'text-base hover:bg-base-300' %>
+        </li>
+        <li>
+          <%= link_to 'API Playground', '/api_playground.html', class: 'text-base hover:bg-base-300' %>
+        </li>
+      <% end %>
       <% if Docuseal.demo? || !Docuseal.multitenant? || (current_user != true_user && !current_account.testing?) %>
         <% if can?(:read, WebhookUrl) %>
           <li>

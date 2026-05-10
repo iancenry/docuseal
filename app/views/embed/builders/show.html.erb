@@ -8,17 +8,88 @@
   data-with-formula="true"
   data-with-phone="true"
   data-with-payment="true"
+  data-autosave="true"
+  data-base-url=""
+  data-fetch-options="<%= { headers: { 'X-Embed-Token' => @token } }.to_json %>"
   data-locale="<%= @embed_account.locale || 'en' %>"
 ></template-builder>
 
 <script>
-  // Notify parent when template is saved
-  document.addEventListener('template:save', function(e) {
-    if (window.DocuSealEmbed) {
-      window.DocuSealEmbed.postMessage('builder:save', {
-        template_id: <%= @template.id %>,
-        template_name: '<%= j(@template.name) %>'
-      });
-    }
-  });
+  // Override baseFetch to route template saves and document uploads through embed endpoints
+  (function() {
+    var token = '<%= j(@token) %>';
+    var templateId = '<%= @template.id %>';
+    var patched = false;
+
+    // Wait for template-builder to mount then patch its save/upload paths
+    var observer = new MutationObserver(function() {
+      var builder = document.querySelector('template-builder');
+      if (!builder || !builder.component) return;
+
+      var vm = builder.component;
+      if (patched) return;
+      patched = true;
+      observer.disconnect();
+
+      var originalBaseFetch = vm.baseFetch.bind(vm);
+      vm.baseFetch = function(path, options) {
+        options = options || {};
+        options.headers = options.headers || {};
+        options.headers['X-Embed-Token'] = token;
+
+        // Route /templates/:id to PUT /embed/builder?template_id=:id&token=...
+        var templateMatch = path.match(/^\/templates\/(\d+)$/);
+        if (templateMatch) {
+          var newPath = '/embed/builder?template_id=' + templateMatch[1] + '&token=' + encodeURIComponent(token);
+          var result = originalBaseFetch.call(this, newPath, options);
+          var method = (options && options.method || 'GET').toUpperCase();
+          if (method === 'PUT') {
+            result.then(function(resp) {
+              if (resp.ok && window.DocuSealEmbed) {
+                window.DocuSealEmbed.postMessage('builder:save', { template_id: parseInt(templateMatch[1]) });
+              }
+            });
+          }
+          return result;
+        }
+
+        // Route /templates/:id/documents to /embed/builder/documents or documents_index
+        var docsMatch = path.match(/^\/templates\/(\d+)\/documents$/);
+        if (docsMatch) {
+          var method = (options.method || 'GET').toUpperCase();
+          if (method === 'GET') {
+            var docsPath = '/embed/builder/documents_index?template_id=' + docsMatch[1] + '&token=' + encodeURIComponent(token);
+          } else {
+            var docsPath = '/embed/builder/documents?template_id=' + docsMatch[1] + '&token=' + encodeURIComponent(token);
+          }
+          var docsResult = originalBaseFetch.call(this, docsPath, options);
+          if (method === 'POST') {
+            docsResult.then(function(resp) {
+              if (resp.ok && window.DocuSealEmbed) {
+                window.DocuSealEmbed.postMessage('builder:upload', { template_id: parseInt(docsMatch[1]) });
+              }
+            });
+          }
+          return docsResult;
+        }
+
+        // Route /templates/:id/detect_fields to /embed/builder/detect_fields
+        var detectMatch = path.match(/^\/templates\/(\d+)\/detect_fields$/);
+        if (detectMatch) {
+          var detectPath = '/embed/builder/detect_fields?template_id=' + detectMatch[1] + '&token=' + encodeURIComponent(token);
+          return originalBaseFetch.call(this, detectPath, options);
+        }
+
+        // Route /account_custom_fields to /embed/builder/custom_fields
+        if (path === '/account_custom_fields') {
+          var cfPath = '/embed/builder/custom_fields?token=' + encodeURIComponent(token);
+          return originalBaseFetch.call(this, cfPath, options);
+        }
+
+        return originalBaseFetch.call(this, path, options);
+      };
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  })();
 </script>

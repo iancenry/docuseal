@@ -18,7 +18,7 @@
 | Formulas                      | $20/mo    | **DONE** — prop enabled             | Trivial |
 | API & Embedding               | $0.20/doc | Dummy JS served                     | High    |
 | HTML Template API             | $0.20/doc | No code exists                      | High    |
-| PDF/DOCX Field Tags API       | $0.20/doc | No code exists                      | Medium  |
+| PDF/DOCX Field Tags API       | $0.20/doc | **DONE** — PDF + DOCX tag parsing   | Medium  |
 | Embedded Signing Form         | $0.20/doc | Dummy JS served                     | High    |
 | Embedded Form Builder         | $0.20/doc | Dummy JS served                     | High    |
 
@@ -96,6 +96,32 @@ Note: Enterprise API paths (`/api/templates/html`, `/api/templates/pdf`, etc.) n
 **Admin should:**
 
 - Full access — unchanged behavior from before
+
+### Phase 7 — PDF/DOCX Field Tags API
+
+**Test PDF endpoint:**
+
+```bash
+# Create a PDF with {{tags}} using HexaPDF, then upload:
+curl -X POST http://localhost:4000/api/templates/pdf \
+  -H "X-Auth-Token: YOUR_API_KEY" \
+  -F "file=@my_tagged_document.pdf" \
+  -F "name=My PDF Template"
+```
+
+**Test DOCX endpoint:**
+
+```bash
+# Upload a DOCX with {{tags}} in the text:
+curl -X POST http://localhost:4000/api/templates/docx \
+  -H "X-Auth-Token: YOUR_API_KEY" \
+  -F "file=@my_tagged_document.docx" \
+  -F "name=My DOCX Template"
+```
+
+**Tag syntax:** `{{Field Name}}`, `{{Field Name|type}}`, `{{Field Name|select|Option1,Option2}}`
+
+**Expected:** Template created with fields auto-detected at correct positions, tags removed from document.
 
 ---
 
@@ -192,136 +218,158 @@ Editor/Viewer roles are fully implemented with ability-based permission scoping.
 
 ---
 
-### Phase 4: Bulk Send from Spreadsheet (Low-Medium effort)
+### Phase 4: Bulk Send from Spreadsheet ✅ DONE
 
-#### 4.1 Backend Controller
+#### What was implemented:
 
-- **Create**: `app/controllers/submissions_spreadsheet_controller.rb`
-- **Route**: `POST /submissions/upload_spreadsheet`
-- **Logic**:
-  1. Accept XLSX/CSV upload
-  2. Parse using existing `rubyXL` or `csv` gems (already in Gemfile)
-  3. Map columns to template fields
-  4. Create submissions for each row
-  5. Send invitation emails
+1. **`app/controllers/upload_spreadsheet_controller.rb`** — New controller that accepts CSV/XLSX uploads, parses them, and returns JSON `[[sheetName, rows]]` for the Vue component. Uses `CSV` for `.csv` files and `RubyXL` for `.xlsx`. Authorized via `authorize!(:create, Submission)`.
 
-#### 4.2 Connect Frontend
+2. **Route**: `POST /upload_spreadsheet` → `upload_spreadsheet#create` (added to `config/routes.rb`)
 
-- **File**: `app/javascript/template_builder/import_list.vue` (already exists)
-- **Fix**: Update fetch URL to match new route
-- **Replace**: `_bulk_send_placeholder.html.erb` with actual form partial
+3. **`app/controllers/submissions_controller.rb`** — Added `submissions_json` branch in `create` action. New `spreadsheet_submissions_params` method parses the JSON from the Vue component's hidden input and builds the hash format expected by `create_submissions`.
+
+4. **`app/views/submissions/_list_form.html.erb`** — Populated with form that renders `<import-list>` Vue custom element, passing template data (name, submitters, fields) as JSON. Includes send_email and extra_fields partials, plus hidden submit buttons div.
+
+5. **`app/javascript/template_builder/import_list.vue`** — Already fully functional (464 lines). Handles file upload via drag-and-drop or file picker, worksheet selection, column-to-field mapping, preview table, and outputs `submissions_json` hidden input.
+
+#### How to test:
+
+1. Navigate to any template → click "Add Recipients"
+2. Switch to "Upload List" tab (visible for templates without variables_schema)
+3. Upload a CSV with columns like: Email, Name, [field names matching template fields]
+4. Map columns to template fields in the UI
+5. Click "Add Recipients" to create submissions in bulk
 
 ---
 
-### Phase 5: Template Embedding (High effort — YOUR PRIORITY)
+### Phase 5: Template Embedding ✅ DONE
 
-This is the most critical feature for your multi-tenant HRMS use case.
+All embedding infrastructure is fully functional for self-hosted OpenSeal.
 
-#### 5.1 Architecture for Multi-Tenant Embedding
+#### What was implemented:
 
+**Pre-existing (already in OSS codebase):**
+
+- `Embed::BaseController` — JWT auth, CORS, CSP headers, `frame-ancestors *`
+- `Embed::FormsController` — show, update, completed actions for signing forms
+- `EmbedScriptsController` — serves JS SDK at `/js/docuseal.js` with `<docuseal-builder>` and `<docuseal-form>` Web Components
+- `Api::EmbedTokensController` — `POST /api/embed_tokens` generates JWT tokens
+- Embed layout (`layouts/embed.html.erb`) — minimal chrome, postMessage helper
+- `JsonWebToken` — encode/decode using Rails secret_key_base
+
+**Added/Fixed:**
+
+- `Embed::BuildersController` — added `update`, `documents`, `documents_index`, `detect_fields`, `custom_fields` actions for full builder API coverage
+- Builder view (`embed/builders/show.html.erb`) — added `baseFetch` patching script that intercepts all template builder API calls and routes them through embed endpoints with JWT auth:
+  - `PUT /templates/:id` → `PUT /embed/builder?template_id=:id`
+  - `GET /templates/:id/documents` → `GET /embed/builder/documents_index?template_id=:id`
+  - `POST /templates/:id/documents` → `POST /embed/builder/documents?template_id=:id`
+  - `POST /templates/:id/detect_fields` → `POST /embed/builder/detect_fields?template_id=:id`
+  - `POST /account_custom_fields` → `POST /embed/builder/custom_fields`
+- Added `data-autosave="true"` to builder view (required for save() to actually fire)
+- Added `ActiveStorage::Current.url_options` setup in `Embed::BaseController` (fixes URL generation for Disk service)
+- PostMessage events: `builder:save` and `builder:upload` sent to parent window on successful operations
+
+**Architecture:**
+
+- Builder saves go through JWT-authenticated embed endpoints (baseFetch patching)
+- Form submissions go through standard `/s/:slug` path (slug IS the auth token — no session needed)
+- JS SDK creates iframes and relays `postMessage` events as `docuseal:*` CustomEvents
+- All endpoints scoped by `@embed_account` for multi-tenant isolation
+
+**Integration Guide:** See [EMBEDDING.md](EMBEDDING.md) for full integration documentation including backend token generation, frontend usage, multi-tenant patterns, React example, and security notes.
+
+---
+
+### Phase 6: HTML Template API ✅ DONE
+
+#### What was implemented:
+
+1. **`app/controllers/api/templates_html_controller.rb`** — API controller at `POST /api/templates/html`
+
+   - Accepts `html` (required), `name`, `css`, `external_id`, `folder_name` parameters
+   - Validates HTML presence and 2MB size limit
+   - Creates template, renders HTML to PDF, detects fields, returns serialized template
+   - Proper error handling with template cleanup on failure
+
+2. **`lib/templates/parse_html_fields.rb`** — Field tag parser
+
+   - Parses `{{field_name}}`, `{{field_name|type}}`, `{{field_name|select|opt1,opt2,opt3}}` syntax
+   - Supports all field types: text, signature, initials, date, image, stamp, checkbox, radio, select, multiple, phone, cells, payment, file, number
+   - Replaces tags with `<span data-docuseal-field>` marker elements for position detection
+   - Generates clean HTML (tags removed) for the final PDF
+
+3. **`lib/templates/create_from_html.rb`** — HTML-to-PDF conversion service
+
+   - Calls Puppeteer via Node.js subprocess (`Open3.popen3`) with proper stdout/stderr separation
+   - Wraps HTML fragments in a full document with default styling
+   - Supports custom CSS via `css` parameter
+   - Extracts field positions from rendered DOM using `getBoundingClientRect()`
+   - Calculates field areas as normalized coordinates (0-1 range) relative to PDF page dimensions
+   - Stores PDF via Active Storage and generates preview images
+
+4. **`lib/templates/render_html_template.js`** — Node.js Puppeteer rendering script
+
+   - Launches headless Chromium, renders HTML, extracts field positions from marker spans
+   - Clears marker text before PDF generation (fields appear as blank areas)
+   - Outputs JSON with base64-encoded PDF and field coordinate data
+
+5. **Route**: `POST /api/templates/html` in `config/routes.rb` (under `api` namespace)
+
+6. **Dependency**: `puppeteer` npm package (includes bundled Chromium)
+
+#### Field tag syntax:
+
+| Syntax                      | Example                          | Result                         |
+| --------------------------- | -------------------------------- | ------------------------------ |
+| `{{Name}}`                  | `{{Full Name}}`                  | Text field named "Full Name"   |
+| `{{Name\|type}}`            | `{{Date\|date}}`                 | Date field                     |
+| `{{Name\|signature}}`       | `{{Sign Here\|signature}}`       | Signature field (200x50px min) |
+| `{{Name\|select\|options}}` | `{{Dept\|select\|Eng,Sales,HR}}` | Select with options            |
+| `{{Name\|checkbox}}`        | `{{Agree\|checkbox}}`            | Checkbox field                 |
+
+#### How to test:
+
+```bash
+curl -X POST http://localhost:4000/api/templates/html \
+  -H "X-Auth-Token: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "html": "<h1>Agreement</h1><p>I, {{Full Name}}, agree.</p><p>Date: {{Date|date}}</p><p>{{Signature|signature}}</p>",
+    "name": "My HTML Template",
+    "css": "h1 { color: #2563eb; }"
+  }'
 ```
-Your HRMS App
-  └── Org A dashboard → embedded DocuSeal builder (Org A's templates)
-  └── Org B dashboard → embedded DocuSeal builder (Org B's templates)
-  └── Employee signing → embedded DocuSeal form
-```
-
-#### 5.2 Embed Authentication (JWT tokens)
-
-- **Create**: `app/controllers/api/embed_tokens_controller.rb`
-- **Route**: `POST /api/embed_token`
-- **Logic**: Generate short-lived JWT with `account_id`, `user_email`, `template_id`
-- **Library**: `jwt` gem already in Gemfile
-
-#### 5.3 Embedded Form Builder Component
-
-- **Create**: `app/controllers/embed/builders_controller.rb`
-- **Route**: `GET /embed/builder?token=<jwt>`
-- **View**: Render the template builder Vue app in an iframe-friendly layout (no nav/header)
-- **Layout**: Create `app/views/layouts/embed.html.erb` (minimal, no navigation)
-- **CORS**: Allow embedding origin domains (configurable per account)
-
-#### 5.4 Embedded Signing Form Component
-
-- **Create**: `app/controllers/embed/forms_controller.rb`
-- **Route**: `GET /embed/form?token=<jwt>&submission_id=<id>`
-- **View**: Render submission form in embed layout
-- **Already exists**: `app/views/submit_form/show.html.erb` — adapt for embed
-
-#### 5.5 JavaScript SDK (Web Components)
-
-- **Create**: `app/javascript/embed/docuseal-builder.js`
-- **Create**: `app/javascript/embed/docuseal-form.js`
-- **Behavior**: Custom elements (`<docuseal-builder>`, `<docuseal-form>`) that:
-  1. Accept `data-token` attribute
-  2. Create an iframe pointing to embed controller
-  3. Communicate via `postMessage` for events (completed, saved, etc.)
-- **Serve from**: Replace dummy in `embed_scripts_controller.rb` with real bundle
-- **Alternative**: Provide npm package for React/Vue wrappers
-
-#### 5.6 Multi-Tenant Account Isolation
-
-- **Your HRMS integration flow**:
-  1. HRMS creates an Account per org via API (or you pre-provision)
-  2. Each org gets its own API key
-  3. Org admin opens embedded builder → creates templates
-  4. HR sends docs via embedded form or API
-  5. Employee signs via embedded signing form
-- **Key files**: Templates already scoped by `account_id` — isolation exists
-
-#### 5.7 Events & Callbacks
-
-- **postMessage events**: `template.created`, `template.saved`, `form.completed`, `form.declined`
-- **Webhook**: Already exists (`SendWebhookRequestJob`) — ensure it fires for embedded flows
-- **Redirect**: Allow `redirect_url` param after signing completion
 
 ---
 
-### Phase 6: HTML Template API (High effort)
+### Phase 7: PDF/DOCX Field Tags API — **DONE** ✅
 
-#### 6.1 Controller
+#### 7.1 PDF with Tags — **DONE**
 
-- **Create**: `app/controllers/api/templates_html_controller.rb`
-- **Route**: `POST /api/templates/html`
-- **Input**: HTML string + CSS (or Tailwind subset)
+- **Controller**: `app/controllers/api/templates_pdf_tags_controller.rb`
+- **Service**: `lib/templates/create_from_pdf_tags.rb`
+- **Route**: `POST /api/templates/pdf` (multipart file upload)
 - **Logic**:
-  1. Parse HTML for `{{field_name}}` placeholders
-  2. Convert HTML → PDF using a rendering engine (wkhtmltopdf, Grover/Puppeteer, or WeasyPrint)
-  3. Create template with auto-detected field positions
-  4. Store PDF via Active Storage
-- **Gem options**: `grover` (Puppeteer-based), `wicked_pdf`, or shell out to `weasyprint`
+  1. Accepts PDF upload (max 50MB, validates content type)
+  2. Extracts `{{field_name|type|options}}` tags from PDF text layer via Pdfium
+  3. Calculates normalized bounding boxes for each tag from character-level text nodes
+  4. Removes tag text from PDF content streams via HexaPDF
+  5. Stores cleaned PDF, generates preview images, creates template with mapped fields
+  6. Supports all field types: text, signature, date, select (with options), checkbox, etc.
 
-#### 6.2 Field Detection from HTML
+#### 7.2 DOCX with Tags — **DONE**
 
-- Parse `{{field:type:name}}` syntax
-- Map to DocuSeal field types (signature, text, date, checkbox, etc.)
-- Calculate field positions from rendered PDF coordinates
-
----
-
-### Phase 7: PDF/DOCX Field Tags API (Medium effort)
-
-#### 7.1 PDF with Tags
-
-- **Create**: `app/controllers/api/templates_pdf_controller.rb`
-- **Route**: `POST /api/templates/pdf`
+- **Controller**: `app/controllers/api/templates_docx_controller.rb`
+- **Service**: `lib/templates/create_from_docx.rb`
+- **Route**: `POST /api/templates/docx` (multipart file upload)
 - **Logic**:
-  1. Accept uploaded PDF
-  2. Parse text layer for `{{field_name}}` tags using HexaPDF
-  3. Calculate bounding boxes for each tag
-  4. Create template with field positions auto-mapped
-  5. Optionally remove tag text from rendered PDF
-
-#### 7.2 DOCX with Tags
-
-- **Create**: `app/controllers/api/templates_docx_controller.rb`
-- **Route**: `POST /api/templates/docx`
-- **Logic**:
-  1. Accept DOCX upload
-  2. Parse XML for `{{tags}}` using `rubyXL` or `docx` gem
-  3. Convert to PDF (LibreOffice headless or similar)
-  4. Map tag positions to PDF coordinates
-  5. Create template
+  1. Accepts DOCX upload (max 50MB, validates content type + extension)
+  2. Parses DOCX XML for `{{tags}}` using Zip::File + Nokogiri (zero new gem deps)
+  3. Converts DOCX to PDF via LibreOffice headless (120s timeout)
+  4. Detects tag positions in converted PDF using Pdfium text nodes
+  5. Removes tags from PDF, stores cleaned PDF, creates template
+- **Middleware**: Updated `ApiPathConsiderJsonMiddleware` to exclude `/templates/pdf` and `/templates/docx` from JSON content-type override (required for multipart uploads)
 
 ---
 
@@ -434,22 +482,6 @@ Your HRMS App
 - Every user belongs to an `account_id`
 - Queries are automatically scoped via `current_account`
 - For your HRMS: 1 DocuSeal Account = 1 Organization
-
-### Embedding Integration Pattern
-
-```
-HRMS Backend                    DocuSeal (self-hosted)
-─────────────                   ──────────────────────
-1. Create account per org  →    POST /api/accounts (need to add)
-2. Store org's API key
-3. User clicks "Documents" →    Generate JWT embed token
-4. Render <docuseal-builder     GET /embed/builder?token=xxx
-     data-token="xxx" />        (iframe with template builder)
-5. Org admin creates template
-6. HR sends for signing    →    POST /api/submissions
-7. Employee opens link     →    GET /embed/form?token=xxx
-8. Signing completed       ←    Webhook → HRMS callback
-```
 
 ---
 

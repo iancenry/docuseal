@@ -20,5 +20,13 @@ services:
     ports:
       - 6380:6379
 
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    ports:
+      - 3100:3000
+    command:
+      - 'gotenberg'
+      - '--api-timeout=120s'
+
 volumes:
   pg_data:

@@ -10,7 +10,9 @@ class ApiPathConsiderJsonMiddleware
        (!env['PATH_INFO'].ends_with?('/documents') || env['REQUEST_METHOD'] != 'POST') &&
        !env['PATH_INFO'].ends_with?('/attachments') &&
        !env['PATH_INFO'].ends_with?('/submitter_sms_clicks') &&
-       !env['PATH_INFO'].ends_with?('/submitter_email_clicks')
+       !env['PATH_INFO'].ends_with?('/submitter_email_clicks') &&
+       !env['PATH_INFO'].ends_with?('/templates/pdf') &&
+       !env['PATH_INFO'].ends_with?('/templates/docx')
       env['CONTENT_TYPE'] = 'application/json'
     end
 

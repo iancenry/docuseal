@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embed Playground — OpenSeal</title>
+    <style>
+        :root {
+            --primary: #6d28d9;
+            --primary-hover: #5b21b6;
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #111827;
+            --text-muted: #6b7280;
+            --text-faint: #9ca3af;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --error: #dc2626;
+            --error-bg: #fef2f2;
+            --radius: 10px;
+            --radius-sm: 6px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* Header */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary);
+        }
+
+        .header-links {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .header-links a {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .header-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Layout */
+        .layout {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.15s;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        .tab:hover {
+            color: var(--text);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text);
+            background: var(--surface);
+            transition: border-color 0.15s, box-shadow 0.15s;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg);
+            border-color: var(--text-muted);
+        }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* Status */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .badge-error {
+            background: var(--error-bg);
+            color: var(--error);
+        }
+
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .badge-success::before {
+            background: var(--success);
+        }
+
+        .badge-error::before {
+            background: var(--error);
+        }
+
+        /* Token display */
+        .token-result {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12px;
+            word-break: break-all;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .token-result.ok {
+            background: var(--success-bg);
+            border: 1px solid #a7f3d0;
+        }
+
+        .token-result.err {
+            background: var(--error-bg);
+            border: 1px solid #fecaca;
+        }
+
+        /* Embed container */
+        .embed-frame {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            min-height: 120px;
+            background: repeating-comb;
+            position: relative;
+            margin-top: 16px;
+        }
+
+        .embed-frame.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            background: linear-gradient(135deg, #fafafa 25%, transparent 25%) -10px 0, linear-gradient(225deg, #fafafa 25%, transparent 25%) -10px 0, linear-gradient(315deg, #fafafa 25%, transparent 25%), linear-gradient(45deg, #fafafa 25%, transparent 25%);
+            background-size: 20px 20px;
+            background-color: #f3f4f6;
+        }
+
+        .embed-frame.empty::after {
+            content: attr(data-placeholder);
+            color: var(--text-faint);
+            font-size: 14px;
+        }
+
+        /* Event log */
+        .log-container {
+            background: #0f172a;
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .log-header {
+            padding: 10px 16px;
+            background: #1e293b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-header span {
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .log-body {
+            padding: 12px 16px;
+            max-height: 220px;
+            overflow-y: auto;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .log-entry {
+            display: flex;
+            gap: 12px;
+            border-bottom: 1px solid #1e293b;
+            padding: 4px 0;
+        }
+
+        .log-time {
+            color: #64748b;
+            flex-shrink: 0;
+        }
+
+        .log-type {
+            color: #a78bfa;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .log-data {
+            color: #94a3b8;
+            word-break: break-all;
+        }
+
+        .log-empty {
+            color: #475569;
+            font-style: italic;
+        }
+
+        /* Inline actions row */
+        .actions-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <h1>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M7 8l-4 4l4 4" />
+                    <path d="M17 8l4 4l-4 4" />
+                    <path d="M14 4l-4 16" />
+                </svg>
+                Embed Playground
+            </h1>
+            <div class="header-links">
+                <a href="/">Back to OpenSeal</a>
+                <a href="/settings/api">API Settings</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <!-- Token Section — always visible -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Token</span>
+                <span class="badge badge-error" id="token-status" style="display:none">No token</span>
+            </div>
+            <p class="card-desc">Generate a JWT embed token to authenticate the builder or form components. Tokens
+                expire after 1 hour.</p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>API Key</label>
+                    <input type="text" id="api-key" placeholder="Your X-Auth-Token">
+                </div>
+                <div class="form-group">
+                    <label>Host</label>
+                    <input type="text" id="host" value="http://localhost:4000">
+                </div>
+                <div class="form-group">
+                    <label>Scope</label>
+                    <select id="scope-type">
+                        <option value="template">Template (for Builder)</option>
+                        <option value="submission">Submission (for Form)</option>
+                        <option value="none">Unscoped</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Scope ID</label>
+                    <input type="number" id="scope-id" value="1" min="1">
+                </div>
+            </div>
+            <div class="actions-row">
+                <button class="btn btn-primary" onclick="generateToken()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    Generate Token
+                </button>
+            </div>
+            <div class="token-result" id="token-display"></div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="builder" onclick="switchTab('builder')">Template Builder</button>
+            <button class="tab" data-tab="form" onclick="switchTab('form')">Signing Form</button>
+            <button class="tab" data-tab="events" onclick="switchTab('events')">Event Log</button>
+        </div>
+
+        <!-- Builder Tab -->
+        <div class="tab-panel active" id="tab-builder">
+            <div class="card">
+                <p class="card-desc">Embed the template builder to create or edit document templates. Upload PDFs, drag
+                    fields, and save — all within the iframe.</p>
+                <div style="display:flex; align-items:flex-end; gap:12px;">
+                    <div class="form-group" style="width:180px;">
+                        <label>Template ID</label>
+                        <input type="number" id="builder-template-id" value="1" min="1">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="loadBuilder()">Load Builder</button>
+                        <button class="btn btn-outline" onclick="clearBuilder()">Clear</button>
+                    </div>
+                </div>
+                <div class="embed-frame empty" id="builder-container"
+                    data-placeholder="Click 'Load Builder' to embed the template builder here"></div>
+            </div>
+        </div>
+
+        <!-- Form Tab -->
+        <div class="tab-panel" id="tab-form">
+            <div class="card">
+                <p class="card-desc">First, create a new submission for a template. This gives you a
+                    <code>submission_id</code> to embed below.</p>
+                <div style="display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;">
+                    <div class="form-group" style="width:160px;">
+                        <label>Template ID</label>
+                        <input type="number" id="new-sub-template-id" value="1" min="1">
+                    </div>
+                    <div class="form-group" style="width:240px;">
+                        <label>Signer Email</label>
+                        <input type="email" id="new-sub-email" placeholder="signer@example.com">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="createSubmission()">Create Submission</button>
+                    </div>
+                </div>
+                <div class="token-result" id="submission-result"></div>
+            </div>
+            <div class="card">
+                <p class="card-desc">Embed the signing form for a submission. Generate a
+                    <strong>submission-scoped</strong> token first (Step 1 above with scope = Submission).</p>
+                <div style="display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;">
+                    <div class="form-group" style="width:160px;">
+                        <label>Submission ID</label>
+                        <input type="number" id="form-submission-id" value="1" min="1">
+                    </div>
+                    <div class="form-group" style="width:240px;">
+                        <label>Email</label>
+                        <input type="email" id="form-email" placeholder="signer@example.com">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="loadForm()">Load Form</button>
+                        <button class="btn btn-outline" onclick="clearForm()">Clear</button>
+                    </div>
+                </div>
+                <div class="embed-frame empty" id="form-container"
+                    data-placeholder="Click 'Load Form' to embed the signing form here"></div>
+            </div>
+        </div>
+
+        <!-- Events Tab -->
+        <div class="tab-panel" id="tab-events">
+            <div class="log-container">
+                <div class="log-header">
+                    <span>PostMessage Events</span>
+                    <button class="btn btn-outline btn-sm" style="color:#94a3b8;border-color:#334155;"
+                        onclick="clearLog()">Clear</button>
+                </div>
+                <div class="log-body" id="event-log">
+                    <div class="log-empty">Waiting for events from embedded components...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dynamically load JS SDK from the configured host
+        function loadSdk() {
+            const host = document.getElementById('host').value || window.location.origin;
+            if (!document.querySelector('script[data-embed-sdk]')) {
+                const s = document.createElement('script');
+                s.src = host + '/js/docuseal.js';
+                s.dataset.embedSdk = '1';
+                document.body.appendChild(s);
+            }
+        }
+        loadSdk();
+
+        // Auto-fill API key from cookie if available
+        (function () {
+            try {
+                const match = document.cookie.match(/api_key=([^;]+)/);
+                if (match) document.getElementById('api-key').value = decodeURIComponent(match[1]);
+            } catch (e) { }
+        })();
+
+        let currentToken = null;
+        let eventCount = 0;
+
+        // ---- Tabs ----
+        function switchTab(name) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+        }
+
+        // ---- Token ----
+        async function generateToken() {
+            const apiKey = document.getElementById('api-key').value.trim();
+            const host = document.getElementById('host').value.trim();
+            const scopeType = document.getElementById('scope-type').value;
+            const scopeId = document.getElementById('scope-id').value;
+            const display = document.getElementById('token-display');
+            const badge = document.getElementById('token-status');
+
+            if (!apiKey) { display.className = 'token-result err'; display.style.display = 'block'; display.textContent = 'Enter your API key (from Settings → API).'; return; }
+
+            try {
+                const body = {};
+                if (scopeType === 'template') body.template_id = parseInt(scopeId);
+                if (scopeType === 'submission') body.submission_id = parseInt(scopeId);
+
+                const resp = await fetch(host + '/api/embed_tokens', {
+                    method: 'POST',
+                    headers: { 'X-Auth-Token': apiKey, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (!resp.ok) {
+                    const err = await resp.text();
+                    display.className = 'token-result err'; display.style.display = 'block';
+                    display.textContent = 'Error ' + resp.status + ': ' + err;
+                    badge.className = 'badge badge-error'; badge.style.display = ''; badge.textContent = 'Error';
+                    return;
+                }
+
+                const data = await resp.json();
+                currentToken = data.token;
+                const expires = new Date(data.expires_at).toLocaleTimeString();
+                display.className = 'token-result ok'; display.style.display = 'block';
+                display.innerHTML = '<strong>Token ready</strong> — expires at ' + expires + '<br>' + currentToken;
+                badge.className = 'badge badge-success'; badge.style.display = ''; badge.textContent = 'Active';
+                logEvent('token:generated', { scope: scopeType, scope_id: scopeId, expires_at: data.expires_at });
+            } catch (e) {
+                display.className = 'token-result err'; display.style.display = 'block';
+                display.textContent = 'Network error: ' + e.message;
+                badge.className = 'badge badge-error'; badge.style.display = ''; badge.textContent = 'Error';
+            }
+        }
+
+        // ---- Builder ----
+        function loadBuilder() {
+            if (!currentToken) { alert('Generate a template-scoped token first.'); return; }
+            const container = document.getElementById('builder-container');
+            container.innerHTML = '';
+            container.className = 'embed-frame';
+
+            const el = document.createElement('docuseal-builder');
+            el.setAttribute('data-token', currentToken);
+            el.setAttribute('data-template-id', document.getElementById('builder-template-id').value);
+            el.setAttribute('data-host', document.getElementById('host').value);
+            el.setAttribute('data-height', '700px');
+            el.addEventListener('docuseal:builder:save', (e) => logEvent('builder:save', e.detail));
+            el.addEventListener('docuseal:builder:upload', (e) => logEvent('builder:upload', e.detail));
+            container.appendChild(el);
+            logEvent('builder:loaded', { template_id: document.getElementById('builder-template-id').value });
+        }
+
+        function clearBuilder() {
+            const c = document.getElementById('builder-container');
+            c.innerHTML = ''; c.className = 'embed-frame empty';
+        }
+
+        // ---- Form ----
+        async function createSubmission() {
+            const apiKey = document.getElementById('api-key').value.trim();
+            const host = document.getElementById('host').value.trim();
+            const templateId = document.getElementById('new-sub-template-id').value;
+            const email = document.getElementById('new-sub-email').value.trim();
+            const display = document.getElementById('submission-result');
+
+            if (!apiKey) { display.className = 'token-result err'; display.style.display = 'block'; display.textContent = 'Enter your API key first (Token section above).'; return; }
+            if (!email) { display.className = 'token-result err'; display.style.display = 'block'; display.textContent = 'Enter a signer email address.'; return; }
+
+            try {
+                const resp = await fetch(host + '/api/submissions', {
+                    method: 'POST',
+                    headers: { 'X-Auth-Token': apiKey, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ template_id: parseInt(templateId), submitters: [{ email: email }] })
+                });
+                if (!resp.ok) {
+                    const err = await resp.text();
+                    display.className = 'token-result err'; display.style.display = 'block';
+                    display.textContent = 'Error ' + resp.status + ': ' + err;
+                    return;
+                }
+                const data = await resp.json();
+                const subId = data[0]?.submission_id || data.id;
+                display.className = 'token-result ok'; display.style.display = 'block';
+                display.innerHTML = '<strong>Submission created!</strong> ID: ' + subId + ' — auto-filled below. Now generate a <strong>Submission-scoped</strong> token with this ID, then click Load Form.';
+                // Auto-fill the form fields
+                document.getElementById('form-submission-id').value = subId;
+                document.getElementById('form-email').value = email;
+                // Also update the token scope to Submission
+                document.getElementById('scope-type').value = 'submission';
+                document.getElementById('scope-id').value = subId;
+                logEvent('submission:created', { submission_id: subId, email: email, template_id: parseInt(templateId) });
+            } catch (e) {
+                display.className = 'token-result err'; display.style.display = 'block';
+                display.textContent = 'Network error: ' + e.message;
+            }
+        }
+
+        function loadForm() {
+            if (!currentToken) { alert('Generate a submission-scoped token first.'); return; }
+            const container = document.getElementById('form-container');
+            container.innerHTML = '';
+            container.className = 'embed-frame';
+
+            const el = document.createElement('docuseal-form');
+            el.setAttribute('data-token', currentToken);
+            el.setAttribute('data-submission-id', document.getElementById('form-submission-id').value);
+            el.setAttribute('data-email', document.getElementById('form-email').value);
+            el.setAttribute('data-host', document.getElementById('host').value);
+            el.setAttribute('data-height', '700px');
+            el.addEventListener('docuseal:form:complete', (e) => logEvent('form:complete', e.detail));
+            el.addEventListener('docuseal:form:completed', (e) => logEvent('form:completed', e.detail));
+            container.appendChild(el);
+            logEvent('form:loaded', { submission_id: document.getElementById('form-submission-id').value });
+        }
+
+        function clearForm() {
+            const c = document.getElementById('form-container');
+            c.innerHTML = ''; c.className = 'embed-frame empty';
+        }
+
+        // ---- Events ----
+        function logEvent(type, data) {
+            eventCount++;
+            const log = document.getElementById('event-log');
+            // Remove empty state
+            const empty = log.querySelector('.log-empty');
+            if (empty) empty.remove();
+            // Update tab badge
+            const evtTab = document.querySelector('[data-tab="events"]');
+            evtTab.textContent = 'Event Log (' + eventCount + ')';
+
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = '<span class="log-time">' + time + '</span><span class="log-type">' + type + '</span><span class="log-data">' + JSON.stringify(data || {}) + '</span>';
+            log.insertBefore(entry, log.firstChild);
+        }
+
+        function clearLog() {
+            eventCount = 0;
+            document.querySelector('[data-tab="events"]').textContent = 'Event Log';
+            document.getElementById('event-log').innerHTML = '<div class="log-empty">Waiting for events from embedded components...</div>';
+        }
+
+        window.addEventListener('message', (e) => {
+            if (e.data && e.data.type && e.data.type.startsWith('docuseal:')) {
+                logEvent(e.data.type, e.data.data);
+            }
+        });
+    </script>
+</body>
+
+</html>

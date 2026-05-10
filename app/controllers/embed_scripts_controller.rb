@@ -26,20 +26,29 @@ class EmbedScriptsController < ActionController::Metal
           iframe.style.width = width;
           iframe.style.height = height;
           iframe.style.border = 'none';
+          iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads');
           iframe.setAttribute('allowfullscreen', 'true');
           iframe.setAttribute('allow', 'clipboard-write');
 
+          this._iframe = iframe;
           this.appendChild(iframe);
 
-          // Listen for postMessage events from iframe
-          window.addEventListener('message', function(event) {
+          this._messageHandler = function(event) {
             if (event.source !== iframe.contentWindow) return;
             if (!event.data || !event.data.type) return;
             if (!event.data.type.startsWith('docuseal:')) return;
 
             const customEvent = new CustomEvent(event.data.type, { detail: event.data.data });
             this.dispatchEvent(customEvent);
-          }.bind(this));
+          }.bind(this);
+          window.addEventListener('message', this._messageHandler);
+        }
+
+        disconnectedCallback() {
+          if (this._messageHandler) {
+            window.removeEventListener('message', this._messageHandler);
+            this._messageHandler = null;
+          }
         }
       }
 
@@ -68,19 +77,28 @@ class EmbedScriptsController < ActionController::Metal
           iframe.style.width = width;
           iframe.style.height = height;
           iframe.style.border = 'none';
+          iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads');
           iframe.setAttribute('allowfullscreen', 'true');
 
+          this._iframe = iframe;
           this.appendChild(iframe);
 
-          // Listen for postMessage events from iframe
-          window.addEventListener('message', function(event) {
+          this._messageHandler = function(event) {
             if (event.source !== iframe.contentWindow) return;
             if (!event.data || !event.data.type) return;
             if (!event.data.type.startsWith('docuseal:')) return;
 
             const customEvent = new CustomEvent(event.data.type, { detail: event.data.data });
             this.dispatchEvent(customEvent);
-          }.bind(this));
+          }.bind(this);
+          window.addEventListener('message', this._messageHandler);
+        }
+
+        disconnectedCallback() {
+          if (this._messageHandler) {
+            window.removeEventListener('message', this._messageHandler);
+            this._messageHandler = null;
+          }
         }
       }
 

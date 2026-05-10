@@ -40,6 +40,11 @@ Rails.application.routes.draw do
       resources :clone, only: %i[create], controller: 'templates_clone'
       resources :submissions, only: %i[index create]
     end
+    scope :templates do
+      post :html, controller: 'templates_html', action: :create
+      post :pdf, controller: 'templates_pdf_tags', action: :create
+      post :docx, controller: 'templates_docx', action: :create
+    end
     resources :tools, only: %i[] do
       post :merge, on: :collection
       post :verify, on: :collection
@@ -67,6 +72,7 @@ Rails.application.routes.draw do
   end
   resource :user_signature, only: %i[edit update destroy]
   resource :user_initials, only: %i[edit update destroy]
+  resource :upload_spreadsheet, only: %i[create], controller: 'upload_spreadsheet'
   resources :submissions_archived, only: %i[index], path: 'submissions/archived'
   resources :submissions, only: %i[index], controller: 'submissions_dashboard'
   resources :submissions, only: %i[show destroy] do
@@ -217,7 +223,16 @@ Rails.application.routes.draw do
   get '/js/:filename', to: 'embed_scripts#show', as: :embed_script
 
   namespace :embed do
-    resource :builder, only: %i[show create]
+    match '*path', to: 'base#preflight', via: :options
+    match '/', to: 'base#preflight', via: :options
+
+    resource :builder, only: %i[show create] do
+      put :update
+      post :documents
+      get :documents_index
+      post :detect_fields, controller: 'embed/builder_detect_fields', action: :create
+      post :custom_fields
+    end
     resource :form, only: %i[show] do
       get :completed
       put ':slug', action: :update, as: :update

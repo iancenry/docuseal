@@ -7,9 +7,13 @@ module Api
     def create
       token_hash = Digest::SHA256.hexdigest(request.headers['X-Auth-Token'])
 
+      max_expire_in = 24.hours.to_i
+      expire_in = [(params[:expire_in] || 1.hour).to_i, max_expire_in].min
+      expire_in = 1.hour.to_i if expire_in <= 0
+
       payload = {
         token_hash: token_hash,
-        exp: (params[:expire_in] || 1.hour).to_i.seconds.from_now.to_i
+        exp: expire_in.seconds.from_now.to_i
       }
 
       # Scope to specific template if provided
