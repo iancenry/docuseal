@@ -13,7 +13,7 @@
 | Identity Verification via SMS | $20/mo    | Stub only, no provider code         | Medium  |
 | Bulk Send from Spreadsheet    | $20/mo    | Frontend exists, no backend         | Low-Med |
 | SSO / SAML                    | $20/mo    | Placeholder only                    | High    |
-| Accept Payments (Stripe)      | $20/mo    | Frontend exists, no backend         | Medium  |
+| Accept Payments (Stripe)      | $20/mo    | **DONE** — API + settings           | Medium  |
 | Conditional Fields            | $20/mo    | **DONE** — prop enabled             | Trivial |
 | Formulas                      | $20/mo    | **DONE** — prop enabled             | Trivial |
 | API & Embedding               | $0.20/doc | Dummy JS served                     | High    |
@@ -396,27 +396,42 @@ curl -X POST http://localhost:4000/api/templates/html \
 
 ---
 
-### Phase 9: Stripe Payments (Medium effort)
+### Phase 9: Stripe Payments — **DONE** ✅
 
-#### 9.1 Backend Controller
+#### What was implemented:
 
-- **Create**: `app/controllers/api/stripe_payments_controller.rb`
-- **Routes**: `POST /api/stripe_payments` (create checkout session), webhook endpoint
-- **Logic**:
-  1. Create Stripe Checkout Session with amount from template field config
-  2. Return session URL
-  3. Handle `checkout.session.completed` webhook
-  4. Mark payment field as completed in submission
+**Backend Controllers:**
 
-#### 9.2 Connect Frontend
+1. **`app/controllers/api/stripe_payments_controller.rb`** — Handles Stripe Checkout session creation (`POST /api/stripe_payments`) and payment verification after redirect (`PUT /api/stripe_payments/:id`). Supports three pricing modes: fixed price (currency + amount), Stripe Price ID (subscriptions), and Payment Link ID. Includes a safe recursive-descent arithmetic formula evaluator for dynamic pricing based on form field values.
 
-- **File**: `app/javascript/submission_form/payment_step.vue` (already exists)
-- **Enable**: Add `data-with-payment="true"` to builder element
+2. **`app/controllers/api/stripe_connect_controller.rb`** — API endpoints for tenant backends to manage Stripe configuration:
+   - `GET /api/stripe_connect` — Check connection status (via `X-Auth-Token`)
+   - `POST /api/stripe_connect` — Configure Stripe keys `{ secret_key, publishable_key, webhook_secret }` (validates key against Stripe API before saving)
+   - `DELETE /api/stripe_connect` — Remove Stripe configuration
+   - `POST /api/stripe_webhooks` — Webhook endpoint, verifies Stripe signature, handles `checkout.session.completed` event
 
-#### 9.3 Stripe Connect (for multi-tenant)
+3. **`app/controllers/stripe_settings_controller.rb`** — Settings UI controller for single-tenant/self-hosted mode (hidden in multitenant)
 
-- Each org connects their own Stripe account
-- Store Stripe keys per account in `EncryptedConfig`
+4. **`app/controllers/stripe_connect_controller.rb`** (non-API) — Catches OAuth flow redirects from payment_settings.vue, redirects to settings page
+
+**Multi-Tenant Safety:**
+
+- **Thread-safe**: All Stripe API calls pass `{ api_key: config['secret_key'] }` per-request — never sets global `Stripe.api_key`
+- **Tenant isolation**: Config loaded via `submitter → account → EncryptedConfig`
+- **API-first**: Tenants configure Stripe via API (`X-Auth-Token`), never log into OpenSeal directly
+- **Settings UI hidden**: In multitenant mode, Payments link hidden from settings nav (matches email/storage/SMS pattern)
+
+**Other Changes:**
+
+- `Gemfile` — Added `gem 'stripe', require: false`
+- `app/models/encrypted_config.rb` — Added `STRIPE_KEY = 'stripe'`
+- `config/routes.rb` — API routes for stripe_connect (show/create/destroy), stripe_payments (create/update), stripe_webhooks; settings UI routes; auth/stripe_connect redirect routes
+- `app/views/stripe_settings/index.html.erb` — Settings page with key fields, connection status, disconnect button, setup guide, webhook URL display
+- `app/views/shared/_settings_nav.html.erb` — Payments link (guarded by `unless Docuseal.multitenant?` + `can?(:manage, EncryptedConfig)`)
+- `app/views/templates/edit.html.erb` — Added `data-is-payment-connected` attribute
+- `config/locales/i18n.yml` — `payments` translation added to all 7 locales
+
+**Architecture Guide:** See [STRIPE_PAYMENTS.md](STRIPE_PAYMENTS.md) for full multi-tenant architecture documentation including API examples, data flow diagrams, webhook setup, and security model.
 
 ---
 
