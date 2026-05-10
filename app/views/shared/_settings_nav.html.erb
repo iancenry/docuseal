@@ -46,6 +46,13 @@
           <%= link_to t('personalization'), settings_personalization_path, class: 'text-base hover:bg-base-300' %>
         </li>
       <% end %>
+      <% unless Docuseal.multitenant? %>
+        <% if can?(:manage, EncryptedConfig) %>
+          <li>
+            <%= link_to t('payments'), settings_payments_path, class: 'text-base hover:bg-base-300' %>
+          </li>
+        <% end %>
+      <% end %>
       <% if can?(:create, current_account.users.new) %>
         <li>
           <%= link_to t('users'), settings_users_path, class: 'text-base hover:bg-base-300' %>
@@ -143,7 +150,7 @@
         <%= Docuseal::SUPPORT_EMAIL %>
       </a>
       <% if Docuseal.version.present? && !Docuseal.multitenant? && can?(:manage, EncryptedConfig) %>
-        <a href="https://github.com/docusealco/docuseal/releases" target="_blank" class="badge badge-outline text-xs block mx-auto mt-4">
+          <a href="<%= Docuseal::GITHUB_URL %>/releases" target="_blank" class="badge badge-outline text-xs block mx-auto mt-4">
           v<%= Docuseal.version %>
         </a>
       <% end %>

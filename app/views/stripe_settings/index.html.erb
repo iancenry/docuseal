@@ -1,0 +1,98 @@
+<div class="flex flex-wrap space-y-4 md:flex-nowrap md:space-y-0">
+  <%= render 'shared/settings_nav' %>
+  <div class="flex-grow max-w-xl mx-auto">
+    <h1 class="text-4xl font-bold mb-4"><%= t('payments') %></h1>
+    <p class="mb-6 text-base-content/70">
+      Connect your Stripe account to accept payments during the document signing process.
+      Add a Payment field to your template and configure the price in the field settings.
+    </p>
+
+    <% value = @encrypted_config.value || {} %>
+
+    <% if value['secret_key'].present? %>
+      <div class="alert alert-success mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span>Stripe is connected. Payment fields in your templates are active.</span>
+      </div>
+    <% end %>
+
+    <%= form_for @encrypted_config, url: settings_payments_path, method: :post, html: { autocomplete: 'off', class: 'space-y-4' } do |f| %>
+      <%= f.fields_for :value do |ff| %>
+        <div class="form-control">
+          <%= ff.label :secret_key, 'Secret Key', class: 'label' %>
+          <% if value['secret_key'].present? %>
+            <%= ff.password_field :secret_key, class: 'base-input', placeholder: 'sk_live_••••••••••••••••••••', value: '' %>
+            <label class="label">
+              <span class="label-text-alt text-base-content/50">Leave blank to keep existing key</span>
+            </label>
+          <% else %>
+            <%= ff.text_field :secret_key, class: 'base-input', placeholder: 'sk_live_... or sk_test_...', required: true %>
+          <% end %>
+        </div>
+
+        <div class="form-control">
+          <%= ff.label :publishable_key, 'Publishable Key', class: 'label' %>
+          <% if value['publishable_key'].present? %>
+            <%= ff.password_field :publishable_key, class: 'base-input', placeholder: 'pk_live_••••••••••••••••••••', value: '' %>
+            <label class="label">
+              <span class="label-text-alt text-base-content/50">Leave blank to keep existing key</span>
+            </label>
+          <% else %>
+            <%= ff.text_field :publishable_key, class: 'base-input', placeholder: 'pk_live_... or pk_test_...', required: true %>
+          <% end %>
+        </div>
+
+        <div class="form-control">
+          <%= ff.label :webhook_secret, 'Webhook Signing Secret', class: 'label' %>
+          <% if value['webhook_secret'].present? %>
+            <%= ff.password_field :webhook_secret, class: 'base-input', placeholder: 'whsec_••••••••••••••••••••', value: '' %>
+            <label class="label">
+              <span class="label-text-alt text-base-content/50">Leave blank to keep existing secret</span>
+            </label>
+          <% else %>
+            <%= ff.text_field :webhook_secret, class: 'base-input', placeholder: 'whsec_... (optional, for webhook verification)' %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="form-control pt-2">
+        <%= f.button t('save'), class: 'base-button' %>
+      </div>
+    <% end %>
+
+    <% if value['secret_key'].present? %>
+      <div class="divider mt-8"></div>
+      <div class="mt-4">
+        <h3 class="text-lg font-semibold mb-2">Disconnect Stripe</h3>
+        <p class="text-sm text-base-content/70 mb-3">
+          This will remove your Stripe API keys. Payment fields in templates will stop working until you reconnect.
+        </p>
+        <%= button_to 'Remove Stripe Configuration', settings_payments_path, method: :delete, class: 'btn btn-error btn-sm', data: { turbo_confirm: 'Are you sure you want to disconnect Stripe?' } %>
+      </div>
+    <% end %>
+
+    <div class="divider mt-8"></div>
+    <div class="mt-4">
+      <h3 class="text-lg font-semibold mb-2">Setup Guide</h3>
+      <ol class="list-decimal list-inside space-y-2 text-sm text-base-content/80">
+        <li>Go to <a href="https://dashboard.stripe.com/apikeys" target="_blank" class="link">Stripe Dashboard > API Keys</a></li>
+        <li>Copy your <strong>Secret Key</strong> and <strong>Publishable Key</strong></li>
+        <li>Paste them above and click Save</li>
+        <li>For webhook support: create a webhook at <a href="https://dashboard.stripe.com/webhooks" target="_blank" class="link">Stripe Dashboard > Webhooks</a></li>
+        <li>Set the endpoint URL to: <code class="bg-base-200 px-1 rounded"><%= request.base_url %>/api/stripe_webhooks</code></li>
+        <li>Select the event <code class="bg-base-200 px-1 rounded">checkout.session.completed</code></li>
+        <li>Copy the Webhook Signing Secret and paste it above</li>
+      </ol>
+    </div>
+
+    <div class="mt-6">
+      <h3 class="text-lg font-semibold mb-2">Usage</h3>
+      <ol class="list-decimal list-inside space-y-2 text-sm text-base-content/80">
+        <li>Edit a template and add a <strong>Payment</strong> field</li>
+        <li>Click the field's settings gear icon to set the price and currency</li>
+        <li>When a signer reaches the payment step, they'll be redirected to Stripe Checkout</li>
+        <li>After successful payment, the form continues to the next step</li>
+      </ol>
+    </div>
+  </div>
+</div>

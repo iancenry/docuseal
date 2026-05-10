@@ -376,6 +376,7 @@ en: &en
   notifications: Notifications
   e_signature: E-Signature
   personalization: Personalization
+  payments: Payments
   users: Users
   plans: Plans
   new: New
@@ -1420,6 +1421,7 @@ es: &es
   notifications: Notificaciones
   e_signature: Firma electrónica
   personalization: Personalización
+  payments: Pagos
   users: Usuarios
   plans: Planes
   new: Nuevo
@@ -2461,6 +2463,7 @@ it: &it
   notifications: Notifiche
   e_signature: Firma elettronica
   personalization: Personalizzazione
+  payments: Pagamenti
   users: Utenti
   plans: Piani
   new: Nuovo
@@ -3503,6 +3506,7 @@ fr: &fr
   notifications: Notifications
   e_signature: E-Signature
   personalization: Personnalisation
+  payments: Paiements
   users: Utilisateurs
   plans: Formules
   new: Nouveau
@@ -4541,6 +4545,7 @@ pt: &pt
   notifications: Notificações
   e_signature: E-Assinatura
   personalization: Personalização
+  payments: Pagamentos
   users: Usuários
   plans: Planos
   new: Novo
@@ -5582,6 +5587,7 @@ de: &de
   notifications: Benachrichtigungen
   e_signature: E-Signatur
   personalization: Personalisierung
+  payments: Zahlungen
   users: Benutzer
   plans: Pläne
   new: Neu
@@ -7028,6 +7034,7 @@ nl: &nl
   notifications: Meldingen
   e_signature: E-handtekening
   personalization: Personalisatie
+  payments: Betalingen
   users: Gebruikers
   plans: Abonnementen
   new: Nieuw

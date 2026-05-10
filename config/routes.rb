@@ -54,6 +54,9 @@ Rails.application.routes.draw do
       resources :submission_events, only: %i[index], path: 'submission/:type'
     end
     resources :embed_tokens, only: %i[create]
+    resource :stripe_connect, only: %i[show create destroy], controller: 'stripe_connect'
+    resources :stripe_payments, only: %i[create update]
+    post 'stripe_webhooks', to: 'stripe_connect#webhook'
   end
 
   resources :verify_pdf_signature, only: %i[create]
@@ -172,6 +175,11 @@ Rails.application.routes.draw do
 
   resources :send_submission_email, only: %i[create]
 
+  scope '/auth' do
+    post 'stripe_connect', to: 'stripe_connect#create'
+    get 'stripe_connect/callback', to: 'stripe_connect#callback'
+  end
+
   resources :submitters, only: %i[] do
     resources :download, only: %i[index], controller: 'submitters_download', constraints: { submitter_id: /\d+/ }
     resources :download, only: %i[index], controller: 'submit_form_completed_download'
@@ -193,6 +201,11 @@ Rails.application.routes.draw do
     resources :sso, only: %i[index], controller: 'sso_settings'
     resources :notifications, only: %i[index create], controller: 'notifications_settings'
     resource :esign, only: %i[show create new update destroy], controller: 'esign_settings'
+    resources :payments, only: %i[index create], controller: 'stripe_settings' do
+      collection do
+        delete '/', action: :destroy
+      end
+    end
     resources :users, only: %i[index]
     resources :archived_users, only: %i[index], path: 'users/:status', controller: 'users',
                                defaults: { status: :archived }

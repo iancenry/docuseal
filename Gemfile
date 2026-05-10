@@ -43,6 +43,7 @@ gem 'shakapacker'
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
 gem 'sqlite3', require: false
+gem 'stripe', require: false
 gem 'strip_attributes'
 gem 'trilogy', require: false
 gem 'turbo-rails'

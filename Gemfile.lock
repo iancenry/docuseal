@@ -553,6 +553,9 @@ GEM
     stringio (3.2.0)
     strip_attributes (2.0.1)
       activemodel (>= 3.0, < 9.0)
+    stripe (19.1.0)
+      bigdecimal
+      logger
     strscan (3.1.8)
     thor (1.5.0)
     timeout (0.6.1)
@@ -666,6 +669,7 @@ DEPENDENCIES
   simplecov
   sqlite3
   strip_attributes
+  stripe
   trilogy
   turbo-rails
   twitter_cldr
