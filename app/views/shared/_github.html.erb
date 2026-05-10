@@ -1,6 +1,18 @@
 <a target="_blank" href="<%= Docuseal::GITHUB_URL %>" rel="noopener noreferrer nofollow" class="relative flex items-center rounded-full px-2 py-0.5 text-xs leading-4 mt-1 text-base-content border border-base-300 tooltip tooltip-bottom" data-tip="Give a star on GitHub">
   <span class="flex items-center justify-between space-x-0.5 font-medium">
     <%= svg_icon('start', class: 'h-3 w-3') %>
-    <span>12k</span>
+    <span id="github-star-count">0</span>
   </span>
 </a>
+<script>
+  fetch('https://api.github.com/repos/<%= Docuseal::GITHUB_URL.sub("https://github.com/", "") %>')
+    .then(function(r) { return r.json() })
+    .then(function(d) {
+      var count = d.stargazers_count;
+      var el = document.getElementById('github-star-count');
+      if (el && count != null) {
+        el.textContent = count >= 1000 ? (count / 1000).toFixed(1) + 'k' : count;
+      }
+    })
+    .catch(function() {});
+</script>

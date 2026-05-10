@@ -405,6 +405,7 @@ curl -X POST http://localhost:4000/api/templates/html \
 1. **`app/controllers/api/stripe_payments_controller.rb`** — Handles Stripe Checkout session creation (`POST /api/stripe_payments`) and payment verification after redirect (`PUT /api/stripe_payments/:id`). Supports three pricing modes: fixed price (currency + amount), Stripe Price ID (subscriptions), and Payment Link ID. Includes a safe recursive-descent arithmetic formula evaluator for dynamic pricing based on form field values.
 
 2. **`app/controllers/api/stripe_connect_controller.rb`** — API endpoints for tenant backends to manage Stripe configuration:
+
    - `GET /api/stripe_connect` — Check connection status (via `X-Auth-Token`)
    - `POST /api/stripe_connect` — Configure Stripe keys `{ secret_key, publishable_key, webhook_secret }` (validates key against Stripe API before saving)
    - `DELETE /api/stripe_connect` — Remove Stripe configuration
