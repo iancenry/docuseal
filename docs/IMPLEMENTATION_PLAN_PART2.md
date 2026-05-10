@@ -336,10 +336,10 @@ add_reference :users, :team, foreign_key: true
 
 | Priority | Phase     | Feature                           | Rationale                                              |
 | -------- | --------- | --------------------------------- | ------------------------------------------------------ |
-| 🔴 P0    | 11        | One-off Submission APIs           | Low effort, high value — completes API parity with Pro |
+| 🔴 P0    | 11        | One-off Submission APIs      ✅     | Low effort, high value — completes API parity with Pro |
 | 🟠 P1    | 12.1      | Enable Verification/KBA fields    | Trivial toggle, enables the field types in builder     |
 | 🟡 P2    | 12.2-12.3 | Verification provider integration | Only if identity verification is a requirement         |
-| 🟡 P2    | 15        | Teams/Tenants UI                  | Only if sub-org grouping needed beyond folders         |
+| 🟡 P2    | 15        | Teams/Tenants UI      ✅            | Only if sub-org grouping needed beyond folders         |
 | 🟢 P3    | 14        | DocuSign Import                   | Nice-to-have for migration                             |
 | 🟢 P3    | 13        | EU Qualified Signatures           | Very niche, high cost/complexity                       |
 

@@ -107,7 +107,9 @@ module DocusignImport
 
   def api_base_url(config)
     env = config['environment'] || 'demo'
-    account_id = config['account_id']
+    account_id = config['account_id'].to_s.gsub(%r{[^a-zA-Z0-9\-]}, '')
+
+    raise ImportError, 'DocuSign account_id is missing' if account_id.blank?
 
     base = BASE_URLS[env] || BASE_URLS['demo']
 
@@ -218,6 +220,9 @@ module DocusignImport
     SearchEntries.enqueue_reindex(template)
 
     template
+  rescue StandardError => e
+    template&.destroy
+    raise ImportError, "Import failed for '#{name}': #{e.message}"
   end
 
   def store_document(template, pdf_data, doc_name)

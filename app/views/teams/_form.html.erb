@@ -11,6 +11,7 @@
     <% if team.persisted? %>
       <div class="form-control">
         <label class="label"><%= t('members') %></label>
+        <input type="hidden" name="team[user_ids][]" value="">
         <div class="space-y-2">
           <% current_account.users.active.where.not(role: 'integration').order(:first_name, :email).each do |user| %>
             <label class="flex items-center space-x-2 cursor-pointer">

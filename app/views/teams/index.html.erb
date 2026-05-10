@@ -28,10 +28,7 @@
           <% @teams.each do |team| %>
             <tr>
               <td class="font-medium"><%= team.name %></td>
-              <td>
-                <% member_count = team.users.active.count %>
-                <%= member_count %>
-              </td>
+              <td><%= @member_counts[team.id] || 0 %></td>
               <td class="max-w-xs truncate text-sm text-neutral-500"><%= team.description %></td>
               <td class="text-right">
                 <div class="flex items-center justify-end space-x-2">

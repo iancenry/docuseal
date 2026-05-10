@@ -10,6 +10,8 @@ class TeamsController < ApplicationController
     @teams = @teams.active.where(account: current_account).order(id: :desc)
 
     @pagy, @teams = pagy(@teams)
+
+    @member_counts = User.where(team_id: @teams.map(&:id), archived_at: nil).group(:team_id).count
   end
 
   def new; end
@@ -28,7 +30,7 @@ class TeamsController < ApplicationController
 
   def update
     if @team.update(team_params)
-      update_team_members if params.dig(:team, :user_ids)
+      update_team_members if params.key?(:team) && params[:team].key?(:user_ids)
 
       redirect_back fallback_location: settings_teams_path, notice: I18n.t('team_has_been_updated')
     else

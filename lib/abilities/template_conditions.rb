@@ -10,7 +10,7 @@ module Abilities
       # Scope by team for non-admin users with a team assigned
       if user.team_id.present? && !user.admin?
         team_user_ids = User.where(team_id: user.team_id, account_id: user.account_id).select(:id)
-        templates = templates.where(author_id: team_user_ids)
+        templates = templates.where(author_id: [nil, *team_user_ids])
       end
 
       return templates unless user.account.testing?
@@ -28,6 +28,8 @@ module Abilities
       if template.account_id == user.account_id
         # Enforce team scoping for non-admin users with a team
         if user.team_id.present? && !user.admin?
+          return true if template.author_id.nil?
+
           team_user_ids = User.where(team_id: user.team_id, account_id: user.account_id).pluck(:id)
           return team_user_ids.include?(template.author_id)
         end
