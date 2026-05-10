@@ -1,0 +1,105 @@
+<div class="flex flex-wrap space-y-4 md:flex-nowrap md:space-y-0">
+  <%= render 'shared/settings_nav' %>
+  <div class="flex-grow max-w-xl mx-auto">
+    <h1 class="text-4xl font-bold mb-4"><%= t('docusign_import') %></h1>
+    <p class="mb-6 text-base-content/70">
+      <%= t('docusign_import_description') %>
+    </p>
+
+    <% value = @encrypted_config.value || {} %>
+
+    <% if value['client_id'].present? %>
+      <div class="alert alert-success mb-6">
+        <%= svg_icon('check', class: 'w-6 h-6') %>
+        <span><%= t('docusign_configured') %></span>
+      </div>
+
+      <% if session[:docusign_access_token].present? %>
+        <div class="flex flex-col sm:flex-row gap-3 mb-6">
+          <%= link_to settings_docusign_import_index_path, class: 'btn btn-primary gap-2' do %>
+            <%= svg_icon('download', class: 'w-5 h-5') %>
+            <%= t('import_templates') %>
+          <% end %>
+          <%= button_to t('disconnect'), disconnect_settings_docusign_import_index_path, method: :delete, class: 'btn btn-ghost btn-sm' %>
+        </div>
+      <% else %>
+        <% redirect_uri = oauth_callback_settings_docusign_import_index_url %>
+        <% config_with_redirect = value.merge('redirect_uri' => redirect_uri) %>
+        <%= link_to DocusignImport.auth_url(config_with_redirect), class: 'btn btn-primary gap-2 mb-6' do %>
+          <%= svg_icon('link', class: 'w-5 h-5') %>
+          <%= t('connect_docusign_account') %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= form_for @encrypted_config, url: settings_docusign_index_path, method: :post, html: { autocomplete: 'off', class: 'space-y-4' } do |f| %>
+      <%= f.fields_for :value do |ff| %>
+        <div class="form-control">
+          <%= ff.label :client_id, t('docusign_integration_key'), class: 'label' %>
+          <% if value['client_id'].present? %>
+            <%= ff.password_field :client_id, class: 'base-input', placeholder: '••••••••-••••-••••-••••-••••••••••••', value: '' %>
+            <label class="label">
+              <span class="label-text-alt text-base-content/50"><%= t('leave_blank_to_keep_existing') %></span>
+            </label>
+          <% else %>
+            <%= ff.text_field :client_id, class: 'base-input', placeholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', required: true %>
+          <% end %>
+        </div>
+
+        <div class="form-control">
+          <%= ff.label :client_secret, t('docusign_secret_key'), class: 'label' %>
+          <% if value['client_secret'].present? %>
+            <%= ff.password_field :client_secret, class: 'base-input', placeholder: '••••••••••••••••••••', value: '' %>
+            <label class="label">
+              <span class="label-text-alt text-base-content/50"><%= t('leave_blank_to_keep_existing') %></span>
+            </label>
+          <% else %>
+            <%= ff.text_field :client_secret, class: 'base-input', required: true %>
+          <% end %>
+        </div>
+
+        <div class="form-control">
+          <%= ff.label :environment, t('environment'), class: 'label' %>
+          <%= ff.select :environment, [['Demo (Sandbox)', 'demo'], ['Production', 'production']], { selected: value['environment'] || 'demo' }, class: 'base-input' %>
+        </div>
+
+        <div class="form-control">
+          <%= ff.label :account_id, t('docusign_account_id'), class: 'label' %>
+          <%= ff.text_field :account_id, class: 'base-input', value: value['account_id'], placeholder: t('auto_detected_on_connect') %>
+          <label class="label">
+            <span class="label-text-alt text-base-content/50"><%= t('optional_auto_detected') %></span>
+          </label>
+        </div>
+      <% end %>
+
+      <div class="form-control pt-2">
+        <%= f.button button_title, class: 'base-button' %>
+      </div>
+    <% end %>
+
+    <% if value['client_id'].present? %>
+      <div class="divider mt-8"></div>
+      <div class="mt-4">
+        <h3 class="text-lg font-semibold mb-2"><%= t('remove_configuration') %></h3>
+        <p class="text-sm text-base-content/70 mb-3">
+          <%= t('docusign_remove_description') %>
+        </p>
+        <%= button_to t('remove_docusign_configuration'), settings_docusign_index_path, method: :delete, class: 'btn btn-error btn-sm', data: { turbo_confirm: t('are_you_sure_') } %>
+      </div>
+    <% end %>
+
+    <div class="divider mt-8"></div>
+    <div class="mt-4">
+      <h3 class="text-lg font-semibold mb-2"><%= t('setup_guide') %></h3>
+      <ol class="list-decimal list-inside space-y-2 text-sm text-base-content/80">
+        <li>Go to <a href="https://admindemo.docusign.com/apps-and-keys" target="_blank" class="link">DocuSign Admin > Apps and Keys</a></li>
+        <li>Click <strong>Add App and Integration Key</strong></li>
+        <li>Copy the <strong>Integration Key</strong> (Client ID)</li>
+        <li>Add a <strong>Secret Key</strong> and copy it</li>
+        <li>Add a <strong>Redirect URI</strong>: <code class="text-xs bg-base-200 px-1 py-0.5 rounded"><%= oauth_callback_settings_docusign_import_index_url rescue 'https://yourdomain.com/settings/docusign_import/oauth_callback' %></code></li>
+        <li>Paste the Integration Key and Secret Key above, then click Save</li>
+        <li>Click <strong>Connect DocuSign Account</strong> to authorize</li>
+      </ol>
+    </div>
+  </div>
+</div>

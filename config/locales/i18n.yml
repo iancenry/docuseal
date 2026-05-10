@@ -552,6 +552,39 @@ en: &en
   no_teams_yet: No teams yet
   description: Description
   members: Members
+  docusign_import: DocuSign Import
+  docusign_import_description: Import your templates from DocuSign into OpenSeal. Configure your DocuSign Integration Key below, then connect your account to start importing.
+  docusign_configured: DocuSign is configured. Connect your account to import templates.
+  docusign_integration_key: Integration Key (Client ID)
+  docusign_secret_key: Secret Key
+  docusign_account_id: Account ID
+  connect_docusign_account: Connect DocuSign Account
+  import_templates: Import Templates
+  import_from_docusign: Import from DocuSign
+  import_selected: Import Selected
+  select_templates_to_import: Select the templates you want to import from DocuSign.
+  please_select_templates_to_import: Please select at least one template to import.
+  please_configure_docusign_first: Please configure DocuSign credentials first.
+  please_connect_docusign_account: Please connect your DocuSign account first.
+  docusign_connected_successfully: DocuSign account connected successfully.
+  docusign_disconnected: DocuSign account disconnected.
+  docusign_configuration_removed: DocuSign configuration has been removed.
+  remove_docusign_configuration: Remove DocuSign Configuration
+  docusign_remove_description: This will remove your DocuSign API credentials. You will need to reconfigure to import templates.
+  no_docusign_templates_found: No templates found in your DocuSign account.
+  docusign_no_templates_hint: Make sure you have templates created in your DocuSign account.
+  templates_imported:
+    one: "%{count} template imported successfully"
+    other: "%{count} templates imported successfully"
+  auto_detected_on_connect: Auto-detected on connect
+  optional_auto_detected: Optional — auto-detected when you connect your account
+  leave_blank_to_keep_existing: Leave blank to keep existing value
+  environment: Environment
+  imported: Imported
+  ready: Ready
+  remove_configuration: Remove Configuration
+  setup_guide: Setup Guide
+  disconnect: Disconnect
   replace: Replace
   allow_tenant_admins_to_invite_new_users: Allow tenant admins to invite new users
   manage_multiple_teams: Manage Multiple Teams

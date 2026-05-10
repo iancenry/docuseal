@@ -1,0 +1,73 @@
+<div class="flex flex-wrap space-y-4 md:flex-nowrap md:space-y-0">
+  <%= render 'shared/settings_nav' %>
+  <div class="flex-grow max-w-2xl mx-auto">
+    <div class="flex flex-col md:flex-row md:flex-wrap gap-2 md:justify-between md:items-end mb-4 min-h-12">
+      <h1 class="text-4xl font-bold"><%= t('import_from_docusign') %></h1>
+      <div class="flex gap-2">
+        <%= link_to t('back'), settings_docusign_index_path, class: 'btn btn-ghost btn-sm' %>
+      </div>
+    </div>
+
+    <% if @templates.blank? %>
+      <div class="text-center py-12 text-neutral-500">
+        <p class="text-lg"><%= t('no_docusign_templates_found') %></p>
+        <p class="text-sm mt-2"><%= t('docusign_no_templates_hint') %></p>
+      </div>
+    <% else %>
+      <%= form_tag settings_docusign_import_index_path, method: :post, id: 'import-form' do %>
+        <p class="text-sm text-base-content/70 mb-4">
+          <%= t('select_templates_to_import') %>
+        </p>
+
+        <div class="overflow-x-auto">
+          <table class="table w-full table-lg">
+            <thead class="bg-base-200">
+              <tr class="text-neutral uppercase">
+                <th class="w-12">
+                  <input type="checkbox" class="checkbox checkbox-sm" id="select-all"
+                         onclick="document.querySelectorAll('.template-checkbox').forEach(c => { if (!c.disabled) c.checked = this.checked })">
+                </th>
+                <th><%= t('name') %></th>
+                <th><%= t('status') %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @templates.each do |tmpl| %>
+                <tr class="<%= 'opacity-50' if tmpl['imported'] %>">
+                  <td>
+                    <% if tmpl['imported'] %>
+                      <%= svg_icon('check', class: 'w-4 h-4 text-success') %>
+                    <% else %>
+                      <input type="checkbox" name="template_ids[]" value="<%= tmpl['id'] %>"
+                             class="checkbox checkbox-sm template-checkbox">
+                    <% end %>
+                  </td>
+                  <td>
+                    <div class="font-medium"><%= tmpl['name'] %></div>
+                    <% if tmpl['description'].present? %>
+                      <div class="text-xs text-neutral-500 truncate max-w-xs"><%= tmpl['description'] %></div>
+                    <% end %>
+                  </td>
+                  <td>
+                    <% if tmpl['imported'] %>
+                      <span class="badge badge-success badge-sm"><%= t('imported') %></span>
+                    <% else %>
+                      <span class="badge badge-ghost badge-sm"><%= t('ready') %></span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex justify-end mt-4">
+          <button type="submit" class="base-button">
+            <%= svg_icon('download', class: 'w-5 h-5') %>
+            <%= t('import_selected') %>
+          </button>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

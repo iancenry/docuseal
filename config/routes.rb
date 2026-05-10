@@ -209,6 +209,17 @@ Rails.application.routes.draw do
         delete '/', action: :destroy
       end
     end
+    resources :docusign, only: %i[index create], controller: 'docusign_settings' do
+      collection do
+        delete '/', action: :destroy
+      end
+    end
+    resources :docusign_import, only: %i[index create] do
+      collection do
+        get :oauth_callback
+        delete :disconnect
+      end
+    end
     resources :users, only: %i[index]
     resources :archived_users, only: %i[index], path: 'users/:status', controller: 'users',
                                defaults: { status: :archived }

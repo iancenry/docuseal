@@ -27,7 +27,8 @@ class EncryptedConfig < ApplicationRecord
     ESIGN_CERTS_KEY = 'esign_certs',
     TIMESTAMP_SERVER_URL_KEY = 'timestamp_server_url',
     APP_URL_KEY = 'app_url',
-    STRIPE_KEY = 'stripe'
+    STRIPE_KEY = 'stripe',
+    DOCUSIGN_KEY = 'docusign'
   ].freeze
 
   belongs_to :account

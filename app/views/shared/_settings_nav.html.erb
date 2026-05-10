@@ -63,6 +63,13 @@
           <%= link_to t('teams'), settings_teams_path, class: 'text-base hover:bg-base-300' %>
         </li>
       <% end %>
+      <% unless Docuseal.multitenant? %>
+        <% if can?(:manage, EncryptedConfig) %>
+          <li>
+            <%= link_to t('docusign_import'), settings_docusign_index_path, class: 'text-base hover:bg-base-300' %>
+          </li>
+        <% end %>
+      <% end %>
       <%= render 'shared/settings_nav_extra' %>
       <% if Docuseal.demo? || !Docuseal.multitenant? %>
         <% if can?(:read, AccessToken) %>
