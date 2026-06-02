@@ -129,6 +129,8 @@ module Submissions
       with_submitter_timezone = configs.find { |c| c.key == AccountConfig::WITH_SUBMITTER_TIMEZONE_KEY }&.value == true
       with_timestamp_seconds = configs.find { |c| c.key == AccountConfig::WITH_TIMESTAMP_SECONDS_KEY }&.value == true
 
+      file_links_expire_at = Accounts.link_expires_at(submission.account) if with_file_links
+
       timezone = account.timezone
       timezone = last_submitter.timezone || account.timezone if with_submitter_timezone
 
@@ -363,7 +365,7 @@ module Submissions
 
               image =
                 begin
-                  Submissions::GenerateResultAttachments.load_vips_image(attachment).autorot
+                  ImageUtils.load_vips(attachment.download, content_type: attachment.content_type, autorot: true)
                 rescue Vips::Error
                   next unless attachment.content_type.starts_with?('image/')
                   next if attachment.byte_size.zero?
@@ -374,7 +376,13 @@ module Submissions
               scale = [600.0 / image.width, 600.0 / image.height].min
 
               resized_image = image.resize([scale, 1].min)
-              io = StringIO.new(resized_image.write_to_buffer('.png'))
+
+              io =
+                if field['type'] == 'image' && !resized_image.has_alpha?
+                  StringIO.new(resized_image.colourspace(:srgb).write_to_buffer('.jpg', strip: true))
+                else
+                  StringIO.new(resized_image.write_to_buffer('.png', strip: true))
+                end
 
               width = field['type'] == 'initials' ? 50 : 200
               height = resized_image.height * (width.to_f / resized_image.width)
@@ -402,7 +410,7 @@ module Submissions
 
                   link =
                     if with_file_links
-                      ActiveStorage::Blob.proxy_url(attachment.blob)
+                      ActiveStorage::Blob.proxy_url(attachment.blob, expires_at: file_links_expire_at)
                     else
                       r.submissions_preview_url(submission.slug, **Docuseal.default_url_options)
                     end

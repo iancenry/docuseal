@@ -455,6 +455,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_120000) do
     t.index ["template_id"], name: "index_template_sharings_on_template_id"
   end
 
+  create_table "template_versions", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "author_id", null: false
+    t.datetime "created_at", null: false
+    t.text "data", null: false
+    t.string "sha1", null: false
+    t.bigint "template_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_template_versions_on_account_id"
+    t.index ["author_id"], name: "index_template_versions_on_author_id"
+    t.index ["template_id", "sha1"], name: "index_template_versions_on_template_id_and_sha1", unique: true
+  end
+
   create_table "templates", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.datetime "archived_at"
@@ -558,6 +571,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_120000) do
     t.bigint "account_id", null: false
     t.datetime "created_at", null: false
     t.text "events", null: false
+    t.text "hmac_secret", null: false
     t.text "secret", null: false
     t.string "sha1", null: false
     t.datetime "updated_at", null: false
@@ -600,6 +614,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_120000) do
   add_foreign_key "template_folders", "template_folders", column: "parent_folder_id"
   add_foreign_key "template_folders", "users", column: "author_id"
   add_foreign_key "template_sharings", "templates"
+  add_foreign_key "template_versions", "accounts"
+  add_foreign_key "template_versions", "templates"
+  add_foreign_key "template_versions", "users", column: "author_id"
   add_foreign_key "templates", "accounts"
   add_foreign_key "templates", "template_folders", column: "folder_id"
   add_foreign_key "templates", "users", column: "author_id"
