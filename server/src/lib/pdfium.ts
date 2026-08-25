@@ -200,43 +200,10 @@ export const FPDF_LIBRARY_CONFIG = koffi.struct('FPDF_LIBRARY_CONFIG', {
   m_RendererType: 'int'
 });
 
-const FORM_FILL_CALLBACK_FIELDS = [
-  'Release',
-  'FFI_Invalidate',
-  'FFI_OutputSelectedRect',
-  'FFI_SetCursor',
-  'FFI_SetTimer',
-  'FFI_KillTimer',
-  'FFI_GetLocalTime',
-  'FFI_OnChange',
-  'FFI_GetPage',
-  'FFI_GetCurrentPage',
-  'FFI_GetRotation',
-  'FFI_ExecuteNamedAction',
-  'FFI_SetTextFieldFocus',
-  'FFI_DoURIAction',
-  'FFI_DoGoToAction',
-  'm_pJsPlatform',
-  'FFI_DisplayCaret',
-  'FFI_GetCurrentPageIndex',
-  'FFI_SetCurrentPage',
-  'FFI_GotoURL',
-  'FFI_GetPageViewRect',
-  'FFI_PageEvent',
-  'FFI_PopupMenu',
-  'FFI_OpenFile',
-  'FFI_EmailTo',
-  'FFI_UploadTo',
-  'FFI_GetPlatform',
-  'FFI_GetLanguage',
-  'FFI_DownloadFromURL',
-  'FFI_PostRequestURL',
-  'FFI_PutRequestURL',
-  'FFI_OnFocusChange',
-  'FFI_DoURIActionWithKeyboardModifier'
-] as const;
+type KoffiTypeSpec = string | ReturnType<typeof koffi.pointer>;
+type KoffiAllocation = ReturnType<typeof koffi.alloc>;
 
-export const FPDF_FORMFILLINFO_V2 = koffi.struct('FPDF_FORMFILLINFO_V2', {
+export const FPDF_FORMFILLINFO_MEMBER_TYPES = {
   version: 'int',
   Release: 'void *',
   FFI_Invalidate: 'void *',
@@ -272,7 +239,9 @@ export const FPDF_FORMFILLINFO_V2 = koffi.struct('FPDF_FORMFILLINFO_V2', {
   FFI_PutRequestURL: 'void *',
   FFI_OnFocusChange: 'void *',
   FFI_DoURIActionWithKeyboardModifier: 'void *'
-});
+} as const satisfies Readonly<Record<string, KoffiTypeSpec>>;
+
+export const FPDF_FORMFILLINFO_V2 = koffi.struct('FPDF_FORMFILLINFO_V2', FPDF_FORMFILLINFO_MEMBER_TYPES);
 
 export const FS_MATRIX = koffi.struct('FS_MATRIX', {
   a: 'float',
@@ -290,10 +259,44 @@ export const FS_RECTF = koffi.struct('FS_RECTF', {
   top: 'float'
 });
 
-export const FPDF_FILEWRITE = koffi.struct('FPDF_FILEWRITE', {
+export const FPDF_FILEWRITE_MEMBER_TYPES = {
   version: 'int',
   WriteBlock: koffi.pointer(SaveWriteBlockProto)
-});
+} as const satisfies Readonly<Record<string, KoffiTypeSpec>>;
+
+export const FPDF_FILEWRITE = koffi.struct('FPDF_FILEWRITE', FPDF_FILEWRITE_MEMBER_TYPES);
+
+function allocateStruct(
+  typeName: string,
+  memberTypes: Readonly<Record<string, KoffiTypeSpec>>,
+  values: Record<string, unknown>
+): KoffiAllocation {
+  const memory = koffi.alloc(typeName, 1);
+
+  try {
+    for (const [name, type] of Object.entries(memberTypes)) {
+      koffi.encode(memory, koffi.offsetof(typeName, name), type, values[name] ?? null);
+    }
+  } catch (error) {
+    freeStruct(memory);
+
+    throw error;
+  }
+
+  return memory;
+}
+
+function freeStruct(memory: KoffiAllocation): void {
+  if (memory === null || memory === undefined) {
+    return;
+  }
+
+  try {
+    koffi.free(memory);
+  } catch {
+    return;
+  }
+}
 
 export const FPDF_STRING = koffi.pointer('FPDF_STRING', koffi.opaque());
 export const FPDF_DOCUMENT = koffi.pointer('FPDF_DOCUMENT', koffi.opaque());
@@ -871,7 +874,7 @@ interface DocumentState {
   pages: Map<number, Page>;
   pageCountCache: number | undefined;
   formHandle: Handle<FPDFFormHandlePtr>;
-  formFillInfoPtr: bigint | null;
+  formFillInfoPtr: KoffiAllocation | null;
   closed: boolean;
 }
 
@@ -901,17 +904,17 @@ function finalizeDocument(state: DocumentState): void {
   getApi().FPDF_CloseDocument(state.documentPtr);
 
   state.documentPtr = null;
+
+  if (state.formFillInfoPtr !== null) {
+    freeStruct(state.formFillInfoPtr);
+    state.formFillInfoPtr = null;
+  }
+
   state.closed = true;
 }
 
 function makeFormFillInfo(): Record<string, number | null> {
-  const info: Record<string, number | null> = { version: 2, xfa_disabled: 0 };
-
-  for (const field of FORM_FILL_CALLBACK_FIELDS) {
-    info[field] = null;
-  }
-
-  return info;
+  return { version: 2, xfa_disabled: 0 };
 }
 
 function sortByReadingOrder<T extends TextNode>(nodes: T[], pageWidth: number): T[] {
@@ -1679,7 +1682,11 @@ export class Document {
       closed: false
     };
 
-    const formFillInfoPtr = koffi.as(makeFormFillInfo(), 'FPDF_FORMFILLINFO_V2 *') as unknown as bigint;
+    const formFillInfoPtr = allocateStruct(
+      'FPDF_FORMFILLINFO_V2',
+      FPDF_FORMFILLINFO_MEMBER_TYPES,
+      makeFormFillInfo()
+    );
 
     state.formFillInfoPtr = formFillInfoPtr;
     state.formHandle = toHandle<FPDFFormHandlePtr>(
@@ -1810,25 +1817,28 @@ export class Document {
 
     const writeBlock = koffi.register(
       (_pThis: unknown, data: unknown, size: unknown): number => {
-        const length = Number(size);
+        const length = Number(size ?? 0);
 
-        if (data === null || !(typeof data === 'bigint') || length <= 0) {
+        if (data === null || data === undefined || !Number.isFinite(length) || length <= 0) {
           return 1;
         }
 
         const chunk = new Uint8Array(length);
 
-        chunk.set(new Uint8Array(koffi.view(data as bigint, length)));
+        chunk.set(new Uint8Array(koffi.view(data, length)));
         stream.write(chunk);
 
         return 1;
       },
-      koffi.pointer(SaveWriteBlockProto)
+      FPDF_FILEWRITE_MEMBER_TYPES.WriteBlock
     );
 
-    try {
-      const fileWrite = koffi.as({ version: 1, WriteBlock: writeBlock }, 'FPDF_FILEWRITE *') as unknown as bigint;
+    const fileWrite = allocateStruct('FPDF_FILEWRITE', FPDF_FILEWRITE_MEMBER_TYPES, {
+      version: 1,
+      WriteBlock: writeBlock
+    });
 
+    try {
       const result = numOf(bindings.FPDF_SaveAsCopy(documentPtr, fileWrite, toUlong(flags)));
 
       if (result === 0) {
@@ -1838,6 +1848,7 @@ export class Document {
       }
     } finally {
       koffi.unregister(writeBlock);
+      freeStruct(fileWrite);
     }
 
     return stream;
@@ -1886,7 +1897,10 @@ export class Document {
       this.#state.formHandle = null;
     }
 
-    this.#state.formFillInfoPtr = null;
+    if (this.#state.formFillInfoPtr !== null) {
+      freeStruct(this.#state.formFillInfoPtr);
+      this.#state.formFillInfoPtr = null;
+    }
 
     if (this.#state.documentPtr !== null) {
       getApi().FPDF_CloseDocument(this.#state.documentPtr);

@@ -1,0 +1,64 @@
+{% extends "layouts/base.njk" %}
+{% block html_title %}Sign in — OpenSeal{% endblock %}
+{% block content %}
+<div class="max-w-sm mx-auto mt-16">
+  <h1 class="text-2xl font-bold text-center mb-6">Sign in to OpenSeal</h1>
+
+  {% block sign_in_form %}
+  <form id="sign-in-form" action="/sign_in" method="post" class="bg-base-100 rounded-box shadow-md p-8 space-y-4">
+    <div>
+      <label for="email" class="label"><span class="label-text">Email</span></label>
+      <input id="email" name="email" type="email" required autofocus autocomplete="email"
+             class="input input-bordered w-full" placeholder="you@example.com" />
+    </div>
+    <div>
+      <label for="password" class="label"><span class="label-text">Password</span></label>
+      <input id="password" name="password" type="password" required autocomplete="current-password"
+             class="input input-bordered w-full" placeholder="••••••••" />
+    </div>
+    <button type="submit" id="sign-in-submit" class="btn btn-primary w-full">Sign in</button>
+  </form>
+  {% endblock %}
+
+  <p class="text-center mt-4 text-sm">
+    <a href="/passwords/new" class="link link-primary">Forgot your password?</a>
+  </p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  // POST /sign_in responds with JSON ({otp_required:true} or the public user).
+  // Intercept the submit, establish the session cookie, then redirect like Devise would.
+  (function () {
+    var form = document.getElementById('sign-in-form');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var submit = document.getElementById('sign-in-submit');
+      submit.disabled = true;
+      var body = new URLSearchParams(new FormData(form));
+      fetch('/sign_in', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+        body: body,
+        credentials: 'same-origin',
+      })
+        .then(function (res) {
+          return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+        })
+        .then(function (result) {
+          if (result.ok && result.data && result.data.otp_required) {
+            window.location.href = '/sign_in?error=' + encodeURIComponent('OTP verification is required; use POST /sign_in/verify_totp.');
+          } else if (result.ok) {
+            window.location.href = '/templates_dashboard';
+          } else {
+            var message = (result.data && result.data.error) || 'Invalid Email or password.';
+            window.location.href = '/sign_in?error=' + encodeURIComponent(message);
+          }
+        })
+        .catch(function () {
+          window.location.href = '/sign_in?error=' + encodeURIComponent('Sign in failed. Please try again.');
+        });
+    });
+  })();
+</script>
+{% endblock %}

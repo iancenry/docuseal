@@ -82,6 +82,35 @@ Node port callers use: `openBytes`/`openFile`/`create`, `pageCount`, `getPage`,
 - Ruby's `@text ||= ''` re-ran on empty pages (falsy `''`); the port uses an
   explicit null sentinel so empty text is cached too.
 
+## Bug fix notes
+
+- **`FPDF_FORMFILLINFO_V2` / `FPDF_FILEWRITE` must live in stable memory.** The
+  first port built both structs with `koffi.as(obj, 'T *')`, but `koffi.as()`
+  only yields *transient* memory that koffi recycles for later encodings —
+  pdfium, like Ruby's `FFI::MemoryPointer` users, retains the form-fill info
+  for the document's lifetime and reads the file-write struct during
+  `FPDF_SaveAsCopy`. The recycled block was overwritten by the next transient
+  allocation (the save-time `FPDF_FILEWRITE`), so `WriteBlock` landed exactly
+  on `FPDF_FORMFILLINFO.Release`; `FPDFDOC_ExitFormFillEnvironment` then
+  "called Release", which was now the *already unregistered* WriteBlock
+  trampoline → koffi threw `Cannot use non-registered callback beyond FFI call`
+  on the next FFI call after every `save()` (tests: "saves documents back to
+  PDF bytes", "creates brand new documents"). Fix: allocate both structs with
+  `koffi.alloc(typeName, 1)` and fill every member explicitly via
+  `koffi.encode(mem, koffi.offsetof(type, member), memberType, value)`
+  (`allocateStruct`/`freeStruct` helpers; freed in `close()`, the GC
+  finalizer, and after each save).
+- **koffi hands callback pointer arguments as external objects, not bigints.**
+  The WriteBlock callback guarded with `typeof data === 'bigint'`, which never
+  matched, so every chunk was silently dropped while still returning 1
+  ("bytes written") — `saveToBuffer()` produced an empty buffer with a success
+  status. The guard now only rejects nullish data / non-positive sizes and
+  copies via `koffi.view(data, length)` regardless of pointer representation.
+- **PNG chunk layout:** the encoder was correct all along (signature at 0–7,
+  IHDR length at 8–11, `IHDR` type at 12–15). The failing test read the length
+  field at offset 12 — which holds `0x49484452` (`"IHDR"`) in any valid PNG.
+  Test expectation corrected to offset 8.
+
 ## Deferred / TODO
 
 - **AcroForm widget introspection**: only `InitFormFillEnvironment` /

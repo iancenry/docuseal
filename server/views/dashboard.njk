@@ -1,0 +1,103 @@
+{% extends "layouts/base.njk" %}
+{% block html_title %}Templates — OpenSeal{% endblock %}
+{% block content %}
+<div class="space-y-4">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold">Templates</h1>
+    <span id="tpl-total" class="badge badge-ghost"></span>
+  </div>
+
+  <div class="overflow-x-auto bg-base-100 rounded-box shadow-md">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Author</th>
+          <th>Filled &amp; completed</th>
+          <th>Updated at</th>
+        </tr>
+      </thead>
+      <tbody id="tpl-rows">
+        <tr><td colspan="4"><span class="loading loading-spinner"></span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="join">
+    <button id="tpl-prev" class="btn btn-sm join-item">Prev</button>
+    <button id="tpl-page-indicator" class="btn btn-sm join-item btn-disabled">Page 1</button>
+    <button id="tpl-next" class="btn btn-sm join-item">Next</button>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function () {
+    var page = parseInt(new URLSearchParams(window.location.search).get('page') || '1', 10);
+    if (!(page >= 1)) page = 1;
+    var rows = document.getElementById('tpl-rows');
+    var indicator = document.getElementById('tpl-page-indicator');
+    var totalBadge = document.getElementById('tpl-total');
+
+    function esc(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function renderRow(t) {
+      var name = '<a class="link link-primary" href="/templates/' + encodeURIComponent(t.slug) + '">' + esc(t.name) + '</a>';
+      if (t.archived_at) name += ' <span class="badge badge-sm badge-warning">archived</span>';
+      var author = t.author && t.author.email ? esc(t.author.email) : '';
+      var fieldsCount = (t.fields && t.fields.length) || 0;
+      var submittersCount = (t.submitters && t.submitters.length) || 0;
+      var updated = t.updated_at ? new Date(t.updated_at).toLocaleString() : '';
+      return '<tr>' +
+        '<td>' + name + '</td>' +
+        '<td>' + author + '</td>' +
+        '<td>' + submittersCount + ' submitter(s), ' + fieldsCount + ' field(s)</td>' +
+        '<td>' + esc(updated) + '</td>' +
+        '</tr>';
+    }
+
+    function load(nextPage) {
+      rows.innerHTML = '<tr><td colspan="4"><span class="loading loading-spinner"></span></td></tr>';
+      fetch('/templates?page=' + nextPage, {
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+      })
+        .then(function (res) {
+          if (res.status === 401) throw new Error('unauthorized');
+          if (!res.ok) throw new Error('failed');
+          return res.json();
+        })
+        .then(function (payload) {
+          var data = payload.data || [];
+          var pagination = payload.pagination || {};
+          page = pagination.page || nextPage;
+          if (data.length === 0) {
+            rows.innerHTML = '<tr><td colspan="4" class="text-center opacity-60">No templates yet.</td></tr>';
+          } else {
+            rows.innerHTML = data.map(renderRow).join('');
+          }
+          indicator.textContent = 'Page ' + page + ' / ' + (pagination.total_pages || 1);
+          totalBadge.textContent = (pagination.count || 0) + ' templates';
+          document.getElementById('tpl-prev').disabled = page <= 1;
+          document.getElementById('tpl-next').disabled =
+            pagination.total_pages !== undefined && page >= pagination.total_pages;
+        })
+        .catch(function (err) {
+          if (err.message === 'unauthorized') {
+            rows.innerHTML = '<tr><td colspan="4" class="text-center">Session expired. <a class="link link-primary" href="/sign_in">Sign in</a>.</td></tr>';
+          } else {
+            rows.innerHTML = '<tr><td colspan="4" class="text-center text-error">Failed to load templates.</td></tr>';
+          }
+        });
+    }
+
+    document.getElementById('tpl-prev').addEventListener('click', function () { load(page - 1); });
+    document.getElementById('tpl-next').addEventListener('click', function () { load(page + 1); });
+    load(page);
+  })();
+</script>
+{% endblock %}

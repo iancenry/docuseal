@@ -1,16 +1,24 @@
-import express from 'express';
-import { config } from 'dotenv';
+import 'dotenv/config';
+import { createApp } from './app.js';
+import { config } from './config.js';
+import { startWebhookWorker, stopWebhookWorker } from './modules/webhooks/worker.js';
 
-config();
+async function main(): Promise<void> {
+  const app = createApp();
+  app.listen(config.apiPort, () => {
+    console.log(`openseal-server (node port) listening on http://localhost:${config.apiPort}`);
+  });
 
-const app = express();
-app.use(express.json({ limit: '50mb' }));
+  await startWebhookWorker();
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'openseal-server', ts: new Date().toISOString() });
-});
+  const shutdown = (): void => {
+    void stopWebhookWorker().finally(() => process.exit(0));
+  };
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
+}
 
-const port = Number(process.env.PORT ?? 4300);
-app.listen(port, () => {
-  console.log(`openseal-server listening on http://localhost:${port}`);
+void main().catch((err) => {
+  console.error('fatal:', err);
+  process.exit(1);
 });

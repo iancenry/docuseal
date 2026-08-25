@@ -1,0 +1,24 @@
+{
+  "name": "@openseal/web",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Vue island bundles for the Node port (template-builder + submission-form islands).",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "daisyui": "^3.9.4",
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.0",
+    "vite": "^5.4.11"
+  }
+}

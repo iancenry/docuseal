@@ -1,0 +1,61 @@
+{# Base HTML shell for the Node/Express port. Extends nothing; all pages extend this. #}
+<!doctype html>
+<html lang="en" data-theme="docuseal">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrfToken | default('') }}" />
+    <title>{% block html_title %}OpenSeal{% endblock %}</title>
+    {% if webCssHref %}
+    <link rel="stylesheet" href="{{ webCssHref }}" />
+    {% else %}
+    <!-- web/dist/web.css not found: run `cd web && npm run build`. Rendering unstyled. -->
+    {% endif %}
+  </head>
+  <body class="bg-base-200 min-h-screen">
+    <nav class="navbar bg-base-100 shadow-sm px-4">
+      <div class="flex-1">
+        <a href="/" class="text-lg font-bold">OpenSeal</a>
+      </div>
+      <ul class="menu menu-horizontal gap-1 px-2">
+        <li><a href="/templates_dashboard">Templates</a></li>
+        <li><a href="/submissions">Submissions</a></li>
+        <li><a href="/webhook_urls">Webhooks</a></li>
+        <li><a href="#" aria-disabled="true" class="opacity-50">API docs</a></li>
+      </ul>
+      <div class="flex-none flex items-center gap-3 pl-4">
+        {% if userEmail %}
+        <span class="text-sm opacity-70">{{ userEmail }}</span>
+        <button id="sign-out-btn" class="btn btn-ghost btn-sm">Sign out</button>
+        {% else %}
+        <a href="/sign_in" class="btn btn-primary btn-sm">Sign in</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <main class="container mx-auto p-6">
+      {% block flash %}
+        {% if flashError %}
+        <div class="alert alert-error mb-4">{{ flashError }}</div>
+        {% endif %}
+        {% if flashNotice %}
+        <div class="alert alert-success mb-4">{{ flashNotice }}</div>
+        {% endif %}
+      {% endblock %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <script>
+      (function () {
+        var btn = document.getElementById('sign-out-btn');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+          fetch('/sign_out', { method: 'DELETE', credentials: 'same-origin' }).then(function () {
+            window.location.href = '/sign_in';
+          });
+        });
+      })();
+    </script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

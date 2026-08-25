@@ -15,18 +15,34 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "connect-pg-simple": "^10.0.0",
     "dotenv": "^17.0.0",
     "drizzle-orm": "^0.44.0",
     "express": "^5.1.0",
-    "koffi": "^2.12.0"
+    "express-session": "^1.19.0",
+    "js-yaml": "^5.4.0",
+    "koffi": "^2.12.0",
+    "nodemailer": "^9.0.5",
+    "nunjucks": "^3.2.4",
+    "pg-boss": "^12.28.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/connect-pg-simple": "^7.0.3",
     "@types/express": "^5.0.0",
+    "@types/express-session": "^1.19.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.0.0",
+    "@types/nodemailer": "^8.0.1",
+    "@types/nunjucks": "^3.2.6",
+    "@types/supertest": "^7.2.1",
     "drizzle-kit": "^0.31.0",
     "postgres": "^3.4.7",
+    "supertest": "^7.2.2",
     "tsx": "^4.20.0",
     "typescript": "^5.8.0",
-    "vitest": "^3.2.0"
+    "vitest": "^3.2.7"
   }
 }

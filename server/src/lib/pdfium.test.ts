@@ -173,7 +173,7 @@ describe('pdfium', () => {
 
       const view = new DataView(png.buffer, png.byteOffset, png.byteLength);
 
-      expect(view.getUint32(12, false)).toBe(13);
+      expect(view.getUint32(8, false)).toBe(13);
       expect(png[12]).toBe('I'.charCodeAt(0));
       expect(png[13]).toBe('H'.charCodeAt(0));
       expect(png[14]).toBe('D'.charCodeAt(0));

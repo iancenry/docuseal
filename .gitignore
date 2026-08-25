@@ -48,3 +48,5 @@ server/node_modules/
 server/dist/
 server/.env
 *.tsbuildinfo
+web/node_modules/
+web/dist/
