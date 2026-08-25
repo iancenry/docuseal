@@ -39,6 +39,8 @@ module Templates
     end
 
     def handle_pdf_or_image(template, file, document_data = nil, params = {}, extract_fields: false, metadata: {})
+      return handle_pdf_or_image_v2(template, file, document_data, params, extract_fields:, metadata:) if v2?
+
       document_data ||= file.read
 
       if file.content_type == PDF_CONTENT_TYPE
@@ -48,6 +50,55 @@ module Templates
           document_data.size < ANNOTATIONS_SIZE_LIMIT ? Templates::BuildAnnotations.call(document_data) : []
       end
 
+      document = create_document(template, file, document_data, metadata, annotations)
+
+      Templates::ProcessDocument.call(document, document_data, extract_fields:)
+    end
+
+    def handle_pdf_or_image_v2(template, file, document_data = nil, params = {}, extract_fields: false, metadata: {})
+      document_data ||= file.read
+
+      unless file.content_type == PDF_CONTENT_TYPE
+        document = create_document(template, file, document_data, metadata)
+
+        return Templates::ProcessDocument.call(document, document_data, extract_fields:)
+      end
+
+      doc = Pdfium::Document.open_bytes(document_data, params[:password])
+
+      document_data = decrypt_document(doc) if doc.encrypted?
+
+      annotations =
+        document_data.size < ANNOTATIONS_SIZE_LIMIT ? Templates::BuildPdfiumAnnotations.call(doc) : []
+
+      document = create_document(template, file, document_data, metadata, annotations)
+
+      Templates::ProcessDocument.call(document, document_data, extract_fields:, doc:)
+    rescue Pdfium::PasswordError
+      raise PdfEncrypted
+    ensure
+      doc&.close
+    end
+
+    def maybe_decrypt_pdf_or_raise(data, params)
+      if data.size < ANNOTATIONS_SIZE_LIMIT && PdfUtils.encrypted?(data)
+        PdfUtils.decrypt(data, params[:password])
+      else
+        data
+      end
+    rescue Pdfium::PasswordError
+      raise PdfEncrypted
+    end
+
+    def decrypt_document(doc)
+      io = StringIO.new
+
+      doc.save(io, flags: Pdfium::FPDF_REMOVE_SECURITY)
+
+      io.tap(&:rewind).read
+    end
+
+    def create_document(template, file, document_data, metadata, annotations = nil)
       sha256 = Base64.urlsafe_encode64(Digest::SHA256.digest(document_data))
 
       blob = ActiveStorage::Blob.create_and_upload!(
@@ -62,19 +113,7 @@ module Templates
         content_type: file.content_type
       )
 
-      document = template.documents.create!(blob:)
-
-      Templates::ProcessDocument.call(document, document_data, extract_fields:)
-    end
-
-    def maybe_decrypt_pdf_or_raise(data, params)
-      if data.size < ANNOTATIONS_SIZE_LIMIT && PdfUtils.encrypted?(data)
-        PdfUtils.decrypt(data, params[:password])
-      else
-        data
-      end
-    rescue HexaPDF::EncryptionError
-      raise PdfEncrypted
+      template.documents.create!(blob:)
     end
 
     def extract_zip_files(files)
@@ -123,6 +162,10 @@ module Templates
       end
 
       raise InvalidFileType, "#{file.content_type}/#{dynamic}"
+    end
+
+    def v2?
+      true
     end
   end
 end

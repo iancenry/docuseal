@@ -125,7 +125,7 @@ module Submissions
           tsa_url:,
           pkcs:,
           uuid: images_pdf_uuid(original_documents.select(&:image?)),
-          name: submission.name || submission.template.name
+          name: submission.name || submission.template&.name
         )
 
       ApplicationRecord.no_touching do
@@ -140,7 +140,8 @@ module Submissions
                                                               AccountConfig::WITH_TIMESTAMP_SECONDS_KEY,
                                                               AccountConfig::ROTATE_INCREMENTAL_PDF_KEY,
                                                               AccountConfig::WITH_SUBMITTER_TIMEZONE_KEY,
-                                                              AccountConfig::WITH_SIGNATURE_ID_REASON_KEY])
+                                                              AccountConfig::WITH_SIGNATURE_ID_REASON_KEY,
+                                                              AccountConfig::WITH_SIGNATURE_ID_COMPLETED_AT_KEY])
 
       with_signature_id = configs.find { |c| c.key == AccountConfig::WITH_SIGNATURE_ID }&.value == true
       is_flatten = configs.find { |c| c.key == AccountConfig::FLATTEN_RESULT_PDF_KEY }&.value != false
@@ -150,6 +151,8 @@ module Submissions
       with_file_links = configs.find { |c| c.key == AccountConfig::WITH_FILE_LINKS_KEY }&.value == true
       with_signature_id_reason =
         configs.find { |c| c.key == AccountConfig::WITH_SIGNATURE_ID_REASON_KEY }&.value != false
+      with_signature_id_completed_at =
+        configs.find { |c| c.key == AccountConfig::WITH_SIGNATURE_ID_COMPLETED_AT_KEY }&.value == true
 
       file_links_expire_at = Accounts.link_expires_at(submitter.account) if with_file_links
 
@@ -201,12 +204,14 @@ module Submissions
                                                                       with_file_links:,
                                                                       with_timestamp_seconds:,
                                                                       with_signature_id_reason:,
+                                                                      with_signature_id_completed_at:,
                                                                       file_links_expire_at:)
     end
 
     def fill_submitter_fields(submitter, account, pdfs_index, with_signature_id:, is_flatten:, with_headings: nil,
                               with_submitter_timezone: false, with_signature_id_reason: true,
-                              with_timestamp_seconds: false, with_file_links: nil,
+                              with_timestamp_seconds: false, with_signature_id_completed_at: false,
+                              with_file_links: nil,
                               file_links_expire_at: Accounts.link_expires_at(account))
       cell_layouters = Hash.new do |hash, valign|
         hash[valign] = HexaPDF::Layout::TextLayouter.new(text_valign: valign.to_sym, text_align: :center)
@@ -294,8 +299,11 @@ module Submissions
           canvas.font(FONT_NAME, size: font_size)
 
           field_type = field['type']
-          field_type = 'file' if field_type == 'image' &&
-                                 !submitter.attachments.find { |a| a.uuid == value }.image?
+
+          if field_type == 'image' &&
+             submitter.attachments.find { |a| a.uuid == value }.then { |a| !a.image? || a.content_type == 'image/heic' }
+            field_type = 'file'
+          end
 
           if field_type == 'signature' && field.dig('preferences', 'with_signature_id').in?([true, false])
             with_signature_id = field['preferences']['with_signature_id']
@@ -334,14 +342,20 @@ module Submissions
 
                 time_format = with_timestamp_seconds ? :detailed : :long
 
+                signature_timestamp =
+                  (with_signature_id_completed_at ? submitter.completed_at : nil) || attachment.created_at
+
                 if with_signature_id_reason || field.dig('preferences', 'reasons').present?
-                  "#{"#{I18n.t('reason')}: " if reason_value}#{reason_value || I18n.t('digitally_signed_by')} " \
-                    "#{submitter.name}#{" <#{submitter.email}>" if submitter.email.present?}\n" \
-                    "#{I18n.l(attachment.created_at.in_time_zone(timezone), format: time_format)} " \
-                    "#{TimeUtils.timezone_abbr(timezone, attachment.created_at)}"
+                  reason_line =
+                    "#{"#{I18n.t('reason')}: " if reason_value}#{reason_value || I18n.t('digitally_signed_by')} " \
+                    "#{submitter.name}#{" <#{submitter.email}>" if submitter.email.present?}"
+
+                  "#{TextUtils.maybe_rtl_reverse(reason_line)}\n" \
+                    "#{I18n.l(signature_timestamp.in_time_zone(timezone), format: time_format)} " \
+                    "#{TimeUtils.timezone_abbr(timezone, signature_timestamp)}"
                 else
-                  "#{I18n.l(attachment.created_at.in_time_zone(timezone), format: time_format)} " \
-                    "#{TimeUtils.timezone_abbr(timezone, attachment.created_at)}"
+                  "#{I18n.l(signature_timestamp.in_time_zone(timezone), format: time_format)} " \
+                    "#{TimeUtils.timezone_abbr(timezone, signature_timestamp)}"
                 end
               end
 
@@ -498,7 +512,9 @@ module Submissions
                 cv.image(PdfIcons.paperclip_io, at: [0, 0], width: box.content_width)
               end
 
-              acc << HexaPDF::Layout::TextFragment.create("#{attachment.filename}\n", font:, font_size:)
+              acc << HexaPDF::Layout::TextFragment.create(
+                "#{TextUtils.maybe_rtl_reverse(attachment.filename.to_s)}\n", font:, font_size:
+              )
             end
 
             lines = layouter.fit(items, area['w'] * width, height).lines
@@ -993,7 +1009,8 @@ module Submissions
     end
 
     def single_sign_reason(submitter)
-      signers = submitter.submission.submitters.sort_by(&:completed_at).map { |s| s.email || s.name || s.phone }
+      signers = submitter.submission.submitters.reject(&:viewer?)
+                         .sort_by(&:completed_at).map { |s| s.email || s.name || s.phone }
 
       format(SIGN_REASON, name: signers.reverse.join(', '))
     end
@@ -1012,7 +1029,7 @@ module Submissions
 
       return sign_reason(reason_name) if config.value == 'multiple'
 
-      if !submitter.submission.submitters.exists?(completed_at: nil) &&
+      if submitter.submission.completed_at? &&
          submitter.completed_at == submitter.submission.submitters.maximum(:completed_at)
         return single_sign_reason(submitter)
       end

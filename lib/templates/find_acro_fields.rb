@@ -173,20 +173,20 @@ module Templates
           **attrs,
           type: 'select',
           options: build_options(field[:Opt], 'select'),
-          default_value: field.field_value.to_s.match?(SELECT_PLACEHOLDER_REGEXP) ? nil : field.field_value
+          default_value: field.field_value.to_s.match?(SELECT_PLACEHOLDER_REGEXP) ? nil : field.field_value.presence
         }
       elsif field.field_type == :Ch && field.concrete_field_type == :multi_select && field[:Opt].present?
         {
           **attrs,
           type: 'multiple',
           options: build_options(field[:Opt], 'multiple'),
-          default_value: field.field_value
+          default_value: field.field_value.presence
         }
       elsif field.field_type == :Tx && field.concrete_field_type == :comb_text_field
         {
           **attrs,
           type: 'cells',
-          default_value: field.field_value
+          default_value: field.field_value.presence
         }
       elsif field.field_type == :Tx
         if field[:AA] && ((field[:AA][:F] && field[:AA][:F][:JS].include?('AFDate_')) ||
@@ -199,13 +199,13 @@ module Templates
           {
             **attrs,
             type: 'date',
-            default_value: field.field_value
+            default_value: field.field_value.presence
           }
         else
           {
             **attrs,
             type: 'text',
-            default_value: field.field_value
+            default_value: field.field_value.presence
           }
         end
       elsif field.field_type == :Sig
@@ -234,7 +234,7 @@ module Templates
 
         {
           uuid: SecureRandom.uuid,
-          value: is_option_number || is_skip_single_value ? '' : option
+          value: is_option_number || is_skip_single_value ? '' : option.presence
         }
       end
     end
@@ -251,7 +251,9 @@ module Templates
             fields_index[annot.hash] ||= HexaPDF::Type::AcroForm::Field.wrap(pdf, annot)
           elsif annot.key?(:Parent)
             field = annot[:Parent]
-            field = field[:Parent] while field[:Parent]
+            seen = Set.new.compare_by_identity
+
+            field = field[:Parent] while field[:Parent] && seen.add?(field.value)
 
             annots_index[field.hash] ||= page
             fields_index[field.hash] ||= HexaPDF::Type::AcroForm::Field.wrap(pdf, field)
@@ -262,7 +264,7 @@ module Templates
       [process_fields_array(pdf, fields_index.values), annots_index]
     end
 
-    def process_fields_array(pdf, array, acc = [])
+    def process_fields_array(pdf, array, acc = [], seen = Set.new.compare_by_identity)
       array.each_with_index do |field, index|
         next if field.nil?
 
@@ -270,10 +272,12 @@ module Templates
           array[index] = field = HexaPDF::Type::AcroForm::Field.wrap(pdf, field)
         end
 
+        next unless seen.add?(field.value)
+
         if field.terminal_field?
           acc << field
         else
-          process_fields_array(pdf, field[:Kids], acc)
+          process_fields_array(pdf, field[:Kids], acc, seen)
         end
       end
 

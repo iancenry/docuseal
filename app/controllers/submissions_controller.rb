@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 class SubmissionsController < ApplicationController
-  before_action :load_template, only: %i[new create]
-  authorize_resource :template, only: %i[new create]
-
+  load_and_authorize_resource :template, only: %i[new create]
   load_and_authorize_resource :submission, only: %i[show destroy]
 
   prepend_before_action :maybe_redirect_com, only: %i[show]
@@ -23,7 +21,7 @@ class SubmissionsController < ApplicationController
   def show
     @submission = Submissions.preload_with_pages(@submission)
 
-    unless @submission.submitters.all?(&:completed_at?)
+    unless @submission.completed_at?
       ActiveRecord::Associations::Preloader.new(
         records: [@submission],
         associations: [{ submitters: :start_form_submission_events }]
@@ -35,10 +33,14 @@ class SubmissionsController < ApplicationController
 
   def new
     authorize!(:new, Submission)
+
+    render :new, layout: 'plain'
   end
 
   def create
-    save_template_message(@template, params) if params[:save_message] == '1'
+    return redirect_to template_path(@template), alert: I18n.t('template_has_been_archived') if @template.archived_at?
+
+    save_template_message(@template, params) if params[:save_message] == '1' && can?(:update, @template)
 
     [params.delete(:subject), params.delete(:body)] if params[:is_custom_message] != '1'
 
@@ -89,6 +91,8 @@ class SubmissionsController < ApplicationController
   private
 
   def create_submissions(template, submissions_params, params)
+    normalize_message_submitter_uuids!(params)
+
     submissions_attrs = submissions_params[:submission].to_h.values
 
     submissions_attrs, _, new_fields =
@@ -141,5 +145,24 @@ class SubmissionsController < ApplicationController
 
   def load_template
     @template = Template.accessible_by(current_ability).find(params[:template_id])
+  end
+
+  def normalize_message_submitter_uuids!(params)
+    return if params[:request_email_per_submitter] == '1'
+
+    uuids = params[:email_message_submitter_uuids]
+
+    return if uuids.blank?
+    return if params[:subject].blank? && params[:body].blank?
+
+    params[:submitter_preferences] =
+      Array.wrap(uuids).index_with { { 'subject' => params[:subject], 'body' => params[:body] } }
+
+    params[:request_email_per_submitter] = '1'
+
+    params.delete(:subject)
+    params.delete(:body)
+
+    params
   end
 end

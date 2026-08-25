@@ -75,6 +75,8 @@ class UsersController < ApplicationController
       authorize!(:manage, account)
 
       @user.account = account
+
+      authorize!(:create, @user)
     end
 
     if @user.update(attrs.except(*(current_user == @user ? %i[password otp_required_for_login role] : %i[password])))

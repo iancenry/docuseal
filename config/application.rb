@@ -19,6 +19,8 @@ module DocuSeal
   class Application < Rails::Application
     config.load_defaults 8.1
 
+    config.active_support.message_serializer = :json
+
     config.autoload_lib(ignore: %w[assets tasks puma])
 
     config.active_storage.routes_prefix = ''
@@ -26,6 +28,8 @@ module DocuSeal
     config.active_storage.draw_routes = ENV['MULTITENANT'] != 'true'
 
     config.active_storage.analyzers = []
+
+    config.active_storage.previewers = []
 
     config.active_storage.variant_processor = :disabled
 

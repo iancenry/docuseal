@@ -197,7 +197,8 @@
           v-else-if="!isCheckboxInput"
           width="100%"
           height="100%"
-          class="max-h-10 opacity-50"
+          class="opacity-50"
+          :style="{ maxHeight: isInlineSize ? '4.4cqmin' : '40px' }"
         />
       </span>
     </div>
@@ -318,7 +319,7 @@ export default {
       default: false
     }
   },
-  emits: ['start-resize', 'stop-resize', 'start-drag', 'stop-drag', 'remove', 'scroll-to', 'add-custom-field', 'click-title'],
+  emits: ['start-resize', 'stop-resize', 'start-drag', 'stop-drag', 'remove', 'scroll-to', 'add-custom-field', 'click-title', 'multi-select'],
   data () {
     return {
       isContenteditable: false,
@@ -725,6 +726,10 @@ export default {
         return
       }
 
+      if (this.inputMode && (this.isValueInput || this.isCheckboxInput || this.isSelectInput)) {
+        return
+      }
+
       document.activeElement?.blur()
 
       e.preventDefault()
@@ -792,6 +797,8 @@ export default {
         } else {
           this.selectedAreasRef.value.splice(this.selectedAreasRef.value.indexOf(this.area), 1)
         }
+
+        this.$emit('multi-select', e)
 
         return
       }

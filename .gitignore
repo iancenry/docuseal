@@ -40,3 +40,5 @@ dump.rdb
 *.onnx
 pg_data/
 docuseal/
+
+/vendor/bundle

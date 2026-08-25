@@ -110,4 +110,67 @@ module HexaPDF
       end
     end
   end
+
+  module CycleSafeInheritedValue
+    using HexaPDF::Type::AcroForm::Field::HashRefinement
+
+    def inherited_value(field, name)
+      seen = Set.new.compare_by_identity
+      seen << field.value
+
+      while field.value[name].nil? && (parent = field[:Parent]) && seen.add?(parent.value)
+        field = parent
+      end
+
+      field.value[name].nil? ? nil : field[name]
+    end
+  end
+
+  module CycleSafeEachField
+    def each_field(terminal_only: true)
+      return to_enum(__method__, terminal_only:) unless block_given?
+
+      seen = Set.new.compare_by_identity
+
+      process_field_array = lambda do |array|
+        array.each_with_index do |field, index|
+          next if field.nil?
+
+          unless field.respond_to?(:type) && field.type == :XXAcroFormField
+            array[index] = field = HexaPDF::Type::AcroForm::Field.wrap(document, field)
+          end
+
+          next unless seen.add?(field.value)
+
+          if field.terminal_field?
+            yield(field)
+          else
+            yield(field) unless terminal_only
+
+            process_field_array.call(field[:Kids])
+          end
+        end
+      end
+
+      process_field_array.call(root_fields)
+
+      self
+    end
+  end
+
+  module CycleSafeFullFieldName
+    def full_field_name(seen = Set.new.compare_by_identity)
+      return field_name unless seen.add?(value)
+
+      if key?(:Parent)
+        [self[:Parent].full_field_name(seen), field_name].compact.join('.')
+      else
+        field_name
+      end
+    end
+  end
 end
+
+HexaPDF::Type::AcroForm::Field.singleton_class.prepend(HexaPDF::CycleSafeInheritedValue)
+HexaPDF::Type::AcroForm::Field.prepend(HexaPDF::CycleSafeFullFieldName)
+HexaPDF::Type::AcroForm::Form.prepend(HexaPDF::CycleSafeEachField)

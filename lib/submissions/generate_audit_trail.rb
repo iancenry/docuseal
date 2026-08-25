@@ -61,7 +61,7 @@ module Submissions
         ActiveStorage::Attachment.create!(
           blob: ActiveStorage::Blob.create_and_upload!(
             io: io.tap(&:rewind), filename: "#{I18n.t('audit_log')} - " \
-                                            "#{submission.name || submission.template.name}.pdf"
+                                            "#{submission.name || submission.template&.name}.pdf"
           ),
           name: 'audit_trail',
           record: submission
@@ -219,7 +219,7 @@ module Submissions
 
         [
           composer.document.layout.formatted_text_box(
-            [{ text: document.filename.to_s }]
+            [{ text: TextUtils.maybe_rtl_reverse(document.filename.to_s) }]
           ),
           composer.document.layout.formatted_text_box(
             [
@@ -272,7 +272,9 @@ module Submissions
           [
             composer.document.layout.formatted_text_box(
               [
-                submission.template_submitters.size > 1 && { text: "#{item['name']}\n" },
+                submission.template_submitters.size > 1 && {
+                  text: "#{TextUtils.maybe_rtl_reverse(item['name'].to_s)}\n"
+                },
                 submitter.email && { text: "#{submitter.email}\n", font: [FONT_NAME, { variant: :bold }] },
                 submitter.name && { text: "#{TextUtils.maybe_rtl_reverse(submitter.name)}\n" },
                 submitter.phone && { text: "#{submitter.phone}\n" }
@@ -282,6 +284,9 @@ module Submissions
           [
             composer.document.layout.formatted_text_box(
               [
+                submitter.viewer? && {
+                  text: "#{I18n.t('view_only')}\n"
+                },
                 submitter.email && (click_email_event || verify_email_event) && {
                   text: "#{I18n.t('email_verification')}: #{I18n.t('verified')}\n"
                 },
@@ -347,6 +352,13 @@ module Submissions
 
           field_name = grouped_value_field_names[value].presence || field['title'].presence || field['name'].to_s
 
+          field_type = field['type']
+
+          if field_type == 'image' &&
+             submitter.attachments.find { |a| a.uuid == value }.then { |a| !a.image? || a.content_type == 'image/heic' }
+            field_type = 'file'
+          end
+
           [
             composer.formatted_text_box(
               [
@@ -359,7 +371,7 @@ module Submissions
               text_align: field_name.to_s.match?(RTL_REGEXP) ? :right : :left,
               line_spacing: 1.3, padding: [0, 0, 2, 0]
             ),
-            if field['type'].in?(%w[image signature initials stamp kba]) &&
+            if field_type.in?(%w[image signature initials stamp kba]) &&
                (attachment = submitter.attachments.find { |a| a.uuid == value }) &&
                attachment.image?
 
@@ -394,7 +406,7 @@ module Submissions
 
               composer.image(io, width:, height:, margin: [5, 0, 10, 0])
               composer.formatted_text_box([{ text: '' }])
-            elsif field['type'].in?(%w[file payment image])
+            elsif field_type.in?(%w[file payment image])
               if field['type'] == 'payment'
                 unit = CURRENCY_SYMBOLS[field['preferences']['currency']] || field['preferences']['currency']
 
@@ -415,11 +427,11 @@ module Submissions
                       r.submissions_preview_url(submission.slug, **Docuseal.default_url_options)
                     end
 
-                  { link:, text: "#{attachment.filename}\n", style: :link }
+                  { link:, text: "#{TextUtils.maybe_rtl_reverse(attachment.filename.to_s)}\n", style: :link }
                 end,
                 padding: [0, 0, 10, 0]
               )
-            elsif field['type'] == 'checkbox'
+            elsif field_type == 'checkbox'
               composer.formatted_text_box([{ text: value.to_s.titleize }], padding: [0, 0, 10, 0])
             else
               if field['type'] == 'date'
@@ -466,6 +478,8 @@ module Submissions
               submitter.name || submitter.email || submitter.phone
           end
 
+        submitter_name = TextUtils.maybe_rtl_reverse(submitter_name.to_s)
+
         text =
           if event.event_type == 'complete_verification'
             I18n.t('submission_event_names.complete_verification_by_html', provider: event.data['method'],
@@ -473,18 +487,22 @@ module Submissions
           elsif event.event_type == 'invite_party' &&
                 (invited_submitter = submission.submitters.find { |e| e.uuid == event.data['uuid'] }) &&
                 (name = submission.template_submitters.find { |e| e['uuid'] == event.data['uuid'] }&.dig('name'))
-            invited_submitter_name = [invited_submitter.name || invited_submitter.email || invited_submitter.phone,
-                                      name].join(' ')
+            invited_submitter_name = TextUtils.maybe_rtl_reverse(
+              [invited_submitter.name || invited_submitter.email || invited_submitter.phone, name].join(' ')
+            )
             I18n.t('submission_event_names.invite_party_by_html', invited_submitter_name:,
                                                                   submitter_name:)
           elsif with_audit_sender && (event.event_type == 'send_email' || event.event_type == 'send_sms')
+            created_by_name = TextUtils.maybe_rtl_reverse(submission.created_by_user.full_name)
+
             [
               I18n.t("submission_event_names.#{event.event_type}_to_html", submitter_name:),
-              "<b>#{I18n.t(:from)}</b> #{submission.created_by_user.full_name} #{submission.created_by_user.email}"
+              "<b>#{I18n.t(:from)}</b> #{created_by_name} #{submission.created_by_user.email}"
             ].join("\n")
           elsif event.event_type == 'delegate_form'
             from = event.data['old_email'].presence ||
                    versions.rfind { |v| v.created_at <= event.event_timestamp }&.then { |v| v.name || v.phone }
+            from = TextUtils.maybe_rtl_reverse(from.to_s)
             I18n.t('submission_event_names.delegate_form_by_html', from:, to: event.data['email'])
           elsif event.event_type.include?('send_')
             I18n.t("submission_event_names.#{event.event_type}_to_html", submitter_name:)

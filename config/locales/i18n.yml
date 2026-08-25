@@ -53,6 +53,28 @@ en: &en
   require_all_recipients: Require all recipients
   stripe_account_has_been_connected: Stripe account has been connected.
   re_connect_stripe: Re-connect Stripe
+  paypal_integration: PayPal Integration
+  paypal_account_has_been_connected: PayPal account has been connected.
+  re_connect_paypal: Re-connect PayPal
+  disconnect: Disconnect
+  failed_to_connect_paypal_please_try_again: Failed to connect PayPal. Please try again.
+  paypal_connection_was_not_completed: PayPal connection was not completed.
+  disconnecting_your_paypal_account_will_prevent_you_from_offering_paypal_services_and_products_on_your_website_do_you_wish_to_continue: Disconnecting your PayPal account will prevent you from offering PayPal services and products on your website. Do you wish to continue?
+  attention_you_currently_cannot_receive_payments_due_to_restriction_on_your_paypal_account_please_reach_out_to_paypal_customer_support_or_connect_to_paypal_com_for_more_information: 'Attention: You currently cannot receive payments due to restriction on your PayPal account. Please reach out to PayPal Customer Support or connect to https://www.paypal.com for more information.'
+  attention_please_confirm_your_email_address_on_paypal_com_in_order_to_receive_payments_you_currently_cannot_receive_payments: 'Attention: Please confirm your email address on https://www.paypal.com/businessprofile/settings in order to receive payments! You currently cannot receive payments.'
+  payment_receipt: Payment Receipt
+  amount_paid: Amount paid
+  transaction: Transaction
+  transaction_id: Transaction ID
+  order_id: Order ID
+  payment_date: Date
+  paid_by: Paid by
+  paid_to: Paid to
+  business: Business
+  country: Country
+  payer_id: Payer ID
+  merchant_id: Merchant ID
+  breakdown: Breakdown
   bcc_recipients: BCC recipients
   resend_pending: Re-send pending
   always_enforce_signing_order: Always enforce the signing order
@@ -86,21 +108,26 @@ en: &en
   you_have_been_invited_to_account_name_product_name_please_sign_up_using_the_link_below_: 'You have been invited to %{account_name} %{product_name}. Please sign up using the link below:'
   sent_using_product_name_in_testing_mode_html: 'Sent using <a href="%{product_url}">%{product_name}</a> in testing mode'
   sent_using_product_name_free_document_signing_html: 'Sent using <a href="%{product_url}">%{product_name}</a> free document signing.'
+  sent_using_product_name_open_source_software_html: 'Sent using <a href="%{product_url}">%{product_name}</a> open-source software.'
   sent_with_docuseal_pro_html: 'Sent with <a href="%{product_url}">OpenSeal Pro</a>'
   show_send_with_docuseal_pro_attribution_in_emails_html: Show "Sent with <span class="link">OpenSeal Pro</span>" attribution in emails
   sign_documents_with_trusted_certificate_provided_by_docu_seal_your_documents_and_data_are_never_shared_with_docu_seal_p_d_f_checksum_is_provided_to_generate_a_trusted_signature: Sign documents with trusted certificate provided by OpenSeal. Your documents and data are never shared with OpenSeal. PDF checksum is provided to generate a trusted signature.
   you_have_been_invited_to_submit_the_name_form: 'You have been invited to submit the "%{name}" form.'
   you_have_been_invited_to_sign_the_name: 'You have been invited to sign the "%{name}".'
+  you_have_been_invited_to_view_the_name: 'You have been invited to view the "%{name}".'
   alternatively_you_can_review_and_download_your_copy_using_the_link_below: "Alternatively, you can review and download your copy using the link below:"
   please_check_the_copy_of_your_name_in_the_email_attachments: 'Please check the copy of your "%{name}" in the email attachments.'
   awaiting_completion_by_the_other_party: "Awaiting completion by the other party"
   review_and_sign: Review and Sign
+  view_document: View Document
   review_and_submit: Review and Submit
   please_contact_us_by_replying_to_this_email_if_you_have_any_questions: "Please contact us by replying to this email if you have any questions."
   submitter_invitation_sms_body_sign: '{account.name} has invited you to sign a document: {submitter.link}'
+  submitter_invitation_sms_body_view: '{account.name} has invited you to view a document: {submitter.link}'
   verification_code_sms_body: 'Verification code: {code}'
   you_are_invited_to_submit_a_form: 'You are invited to submit a form'
   you_are_invited_to_sign_a_document: 'You are invited to sign a document'
+  you_are_invited_to_view_a_document: 'You are invited to view a document'
   you_are_invited_to_sign_documents: 'You are invited to sign documents'
   your_document_copy: 'Your document copy'
   name_has_been_completed_by_submitters: '"%{name}" has been completed by %{submitters}.'
@@ -111,6 +138,17 @@ en: &en
     You have been invited to sign the "{template.name}".
 
     [Review and Sign]({submitter.link})
+
+    Please contact us by replying to this email if you have any questions.
+
+    Thanks,
+    {account.name}
+  submitter_invitation_email_view_body: |
+    Hi there,
+
+    You have been invited to view the "{template.name}".
+
+    [View Document]({submitter.link})
 
     Please contact us by replying to this email if you have any questions.
 
@@ -190,6 +228,7 @@ en: &en
   profile_details: Profile Details
   sign_up_with_google: Sign up with Google
   sign_up_with_microsoft: Sign up with Microsoft
+  redirecting_to_provider: Redirecting to %{provider}...
   by_creating_an_account_you_agree_to_our_html: 'By creating an account, you agree to our <a target="_blank" href="https://www.docuseal.com/privacy">Privacy Policy</a> and <a target="_blank" href="https://www.docuseal.com/terms">Terms of Service</a>.'
   enter_email_to_continue: Enter email to continue
   account: Account
@@ -306,6 +345,8 @@ en: &en
   invalid_timeserver: Invalid Timeserver
   email_templates: Email Templates
   signature_request_email: Signature request email
+  view_documents_email: View documents email
+  view_only: View only
   signature_request_reminder_email: Signature request reminder email
   signature_request_sms: Signature Request SMS
   verification_code_sms: Verification Code SMS
@@ -437,7 +478,7 @@ en: &en
   back_to_active: Back to Active
   submissions: Submissions
   templates: Templates
-  document_templates_html: <span class="hidden md:inline">Document</span> Templates
+  document_templates_html: <span class="hidden lg:inline">Document</span> Templates
   archived: Archived
   search: Search
   submissions_not_found: Submissions not Found
@@ -597,6 +638,9 @@ en: &en
   there_are_no_signatures: There are no signatures
   signed_with_trusted_certificate: Signed with trusted certificate
   signed_with_external_certificate: Signed with external certificate
+  signature_valid: Signature valid
+  signature_verification_failed: Signature verification failed
+  contains_unsigned_changes_after_the_last_signature: Contains unsigned changes after the last signature
   setup_2fa_to_continue: Setup 2FA to continue.
   create_a_new_account: Create a new account.
   you_are_already_signed_in: You are already signed in.
@@ -609,6 +653,7 @@ en: &en
   form_has_been_archived: Form has been archived.
   form_has_been_expired: Form has been expired.
   form_has_been_declined: Form has been declined.
+  form_is_view_only: Form is view only.
   file_is_missing: File is missing
   folder_name_has_been_updated: Folder name has been updated.
   unable_to_rename_folder: Unable to rename folder.
@@ -693,6 +738,10 @@ en: &en
   signers: Signers
   not_invited_yet:  Not invited yet
   not_completed_yet: Not completed yet
+  not_completed: Not completed
+  not_viewed_yet: Not viewed yet
+  not_viewed: Not viewed
+  viewed_on_time: 'Viewed on %{time}'
   declined_on_time: 'Declined on %{time}'
   expire_on_time: 'Expire on %{time}'
   sign_in_person: Sign In-person
@@ -917,6 +966,7 @@ en: &en
   mobile: Mobile
   tablet: Tablet
   reset_default: Reset default
+  smtp_settings_have_been_reset: SMTP settings have been reset.
   send_signature_request_email: Send signature request email
   last_3_months: Last 3 months
   last_6_months: Last 6 months
@@ -947,6 +997,7 @@ en: &en
   please_verify_your_email_address_to_continue: Please verify your email address to continue.
   verification_code_sent_click_link_or_enter_code: A verification code has been sent to your email. Click the email link or enter the one time code to confirm your email.
   use_otp_code_to_verify_email_or_click_link_below_html: 'Use <b>%{code}</b> code to verify your email or click the link below:'
+  use_otp_code_to_verify_email_html: 'Use <b>%{code}</b> code to verify your email:'
   verify_your_email: Verify your email
   your_email_has_been_confirmed: Your email has been confirmed.
   invalid_or_expired_verification_code: Invalid or expired verification code.
@@ -962,6 +1013,7 @@ en: &en
   undo: Undo
   redo: Redo
   add_variable: Add variable
+  variable: Variable
   enter_a_url_or_variable_name: Enter a URL or variable name
   new_token: New token
   token: Token
@@ -981,6 +1033,13 @@ en: &en
   open_file_from: 'Open file from'
   cancel: Cancel
   open: Open
+  signature_request_email_sent_to_recipients_with_a_link_to_review_and_sign: Signature request email sent to recipients with a link to review and sign.
+  view_only_email_sent_to_recipients_that_need_to_only_review_the_documents: View only email sent to recipients that need to only review the documents.
+  reminds_recipients_who_havent_completed_their_part_yet_to_sign_following_the_reminders_schedule: Reminds recipients who haven't completed their part yet to sign, following the reminders schedule.
+  signature_request_sms_sent_to_recipients_with_a_link_to_review_and_sign: Signature request SMS sent to recipients with a link to review and sign.
+  phone_2fa_verification_text_message: Phone 2FA verification text message.
+  notification_email_sent_to_the_sender_user_and_bcc_addresses_once_the_submission_is_completed_by_all_parties: Notification email sent to the sender user and BCC addresses once the submission is completed by all parties.
+  completed_documents_copy_email_sent_to_recipients_upon_completion_containing_their_documents: Completed documents copy email sent to recipients upon completion containing their documents.
   devise:
     confirmations:
       confirmed: Your email address has been successfully confirmed.
@@ -996,6 +1055,7 @@ en: &en
     invite: Invite
     link: Link
     mcp: MCP
+    self: Sign Yourself
   submission_event_names:
     send_email_to_html: '<b>Email sent</b> to %{submitter_name}'
     bounce_email_html: '<b>Email bounced</b> %{submitter_name}'
@@ -1109,9 +1169,16 @@ en: &en
     submission_submitters: Submitters list
     submission_link: Submission link
     documents_link: Documents link
+  date:
+    formats:
+      default: "%m/%d/%Y"
+      short: "%b %-d"
+      long: "%B %-d, %Y"
   time:
     formats:
-      detailed: "%B %d, %Y %H:%M:%S"
+      short: "%b %-d, %-I:%M %p"
+      long: "%B %-d, %Y at %-I:%M %p"
+      detailed: "%B %-d, %Y at %-I:%M:%S %p"
 
 es: &es
   knowledge_based_authentication: Autenticación basada en el conocimiento
@@ -1140,6 +1207,27 @@ es: &es
   stripe_integration: Integración con Stripe
   stripe_account_has_been_connected: La cuenta de Stripe ha sido conectada.
   re_connect_stripe: Volver a conectar Stripe
+  paypal_integration: Integración con PayPal
+  paypal_account_has_been_connected: La cuenta de PayPal ha sido conectada.
+  re_connect_paypal: Volver a conectar PayPal
+  failed_to_connect_paypal_please_try_again: No se pudo conectar PayPal. Por favor, inténtalo de nuevo.
+  paypal_connection_was_not_completed: La conexión con PayPal no se completó.
+  disconnecting_your_paypal_account_will_prevent_you_from_offering_paypal_services_and_products_on_your_website_do_you_wish_to_continue: Desconectar tu cuenta de PayPal impedirá que ofrezcas servicios y productos de PayPal en tu sitio web. ¿Deseas continuar?
+  attention_you_currently_cannot_receive_payments_due_to_restriction_on_your_paypal_account_please_reach_out_to_paypal_customer_support_or_connect_to_paypal_com_for_more_information: 'Atención: Actualmente no puedes recibir pagos debido a una restricción en tu cuenta de PayPal. Por favor, contacta con el Soporte al Cliente de PayPal o visita https://www.paypal.com para más información.'
+  attention_please_confirm_your_email_address_on_paypal_com_in_order_to_receive_payments_you_currently_cannot_receive_payments: 'Atención: Por favor, confirma tu dirección de correo electrónico en https://www.paypal.com/businessprofile/settings para poder recibir pagos. Actualmente no puedes recibir pagos.'
+  payment_receipt: Recibo de pago
+  amount_paid: Importe pagado
+  transaction: Transacción
+  transaction_id: ID de transacción
+  order_id: ID de pedido
+  payment_date: Fecha
+  paid_by: Pagado por
+  paid_to: Pagado a
+  business: Empresa
+  country: País
+  payer_id: ID de pagador
+  merchant_id: ID de comerciante
+  breakdown: Desglose
   private: Privado
   _variables: Variables
   your_email_address_has_been_released_immediately_you_can_now_be_added_to_your_company_team_without_waiting_for_the_deletion_period_to_end: Su dirección de correo electrónico ha sido liberada inmediatamente. Si se une a un equipo, ahora puede ser invitado al equipo de su empresa sin esperar a que finalice el período de eliminación.
@@ -1183,6 +1271,7 @@ es: &es
   you_have_been_invited_to_account_name_product_name_please_sign_up_using_the_link_below_: 'Has sido invitado a %{account_name} %{product_name}. Por favor, regístrate usando el enlace a continuación:'
   sent_using_product_name_in_testing_mode_html: 'Enviado usando <a href="%{product_url}">%{product_name}</a> en Modo de Prueba'
   sent_using_product_name_free_document_signing_html: 'Enviado usando la firma de documentos gratuita de <a href="%{product_url}">%{product_name}</a>.'
+  sent_using_product_name_open_source_software_html: 'Enviado usando el software de código abierto de <a href="%{product_url}">%{product_name}</a>.'
   sent_with_docuseal_pro_html: 'Enviado con <a href="%{product_url}">OpenSeal Pro</a>'
   show_send_with_docuseal_pro_attribution_in_emails_html: Mostrar el mensaje "Enviado con <span class="link">OpenSeal Pro</span>" en los correos electrónicos
   sign_documents_with_trusted_certificate_provided_by_docu_seal_your_documents_and_data_are_never_shared_with_docu_seal_p_d_f_checksum_is_provided_to_generate_a_trusted_signature: Firme documentos con un certificado de confianza proporcionado por OpenSeal. Sus documentos y datos nunca se comparten con OpenSeal. Se proporciona un checksum de PDF para generar una firma de confianza.
@@ -1190,15 +1279,19 @@ es: &es
   thanks: Gracias
   you_have_been_invited_to_submit_the_name_form: 'Has sido invitado/a a enviar el formulario "%{name}".'
   you_have_been_invited_to_sign_the_name: 'Has sido invitado/a a firmar el "%{name}".'
+  you_have_been_invited_to_view_the_name: 'Has sido invitado/a a ver el "%{name}".'
   alternatively_you_can_review_and_download_your_copy_using_the_link_below: "Alternativamente, puedes revisar y descargar tu copia usando el enlace a continuación:"
   please_check_the_copy_of_your_name_in_the_email_attachments: 'Por favor, revisa la copia de tu "%{name}" en los archivos adjuntos del correo electrónico.'
   review_and_sign: Revisar y Firmar
+  view_document: Ver documento
   review_and_submit: Revisar y Enviar
   please_contact_us_by_replying_to_this_email_if_you_have_any_questions: "Por favor, contáctanos respondiendo a este correo si tienes alguna pregunta."
   submitter_invitation_sms_body_sign: '{account.name} te ha invitado a firmar un documento: {submitter.link}'
+  submitter_invitation_sms_body_view: '{account.name} te ha invitado a ver un documento: {submitter.link}'
   verification_code_sms_body: 'Código de verificación: {code}'
   you_are_invited_to_submit_a_form: 'Estás invitado/a a enviar un formulario'
   you_are_invited_to_sign_a_document: 'Estás invitado/a a firmar un documento'
+  you_are_invited_to_view_a_document: 'Estás invitado/a a ver un documento'
   you_are_invited_to_sign_documents: 'Estás invitado/a a firmar documentos'
   your_document_copy: 'Tu copia del documento'
   name_has_been_completed_by_submitters: '"%{name}" ha sido completado por %{submitters}.'
@@ -1209,6 +1302,17 @@ es: &es
     Has sido invitado/a a firmar el "{template.name}".
 
     [Revisar y Firmar]({submitter.link})
+
+    Por favor, contáctanos respondiendo a este correo si tienes alguna pregunta.
+
+    Gracias,
+    {account.name}
+  submitter_invitation_email_view_body: |
+    Hola,
+
+    Has sido invitado/a a ver el "{template.name}".
+
+    [Ver documento]({submitter.link})
 
     Por favor, contáctanos respondiendo a este correo si tienes alguna pregunta.
 
@@ -1287,6 +1391,7 @@ es: &es
   profile_details: Detalles del perfil
   sign_up_with_google: Registrarse con Google
   sign_up_with_microsoft: Registrarse con Microsoft
+  redirecting_to_provider: Redirigiendo a %{provider}...
   by_creating_an_account_you_agree_to_our_html: 'Al crear una cuenta, aceptas nuestra <a target="_blank" href="https://www.docuseal.com/privacy">Política de Privacidad</a> y <a target="_blank" href="https://www.docuseal.com/terms">Términos de Servicio</a>.'
   enter_email_to_continue: Ingresa tu correo electrónico para continuar
   account: Cuenta
@@ -1403,6 +1508,8 @@ es: &es
   invalid_timeserver: Servidor de tiempo inválido
   email_templates: Plantillas de correo electrónico
   signature_request_email: Correo de solicitud de firma
+  view_documents_email: Correo de visualización de documentos
+  view_only: Solo lectura
   signature_request_reminder_email: Correo de recordatorio de solicitud de firma
   signature_request_sms: SMS de solicitud de firma
   verification_code_sms: SMS de código de verificación
@@ -1412,6 +1519,13 @@ es: &es
   completed_form_message: Mensaje de formulario completado
   completed_form_redirect_button: Botón de redirección de formulario completado
   documents_copy_email: Correo de copia de documentos
+  signature_request_email_sent_to_recipients_with_a_link_to_review_and_sign: Correo de solicitud de firma enviado a los destinatarios con un enlace para revisar y firmar.
+  view_only_email_sent_to_recipients_that_need_to_only_review_the_documents: Correo de solo lectura enviado a los destinatarios que solo necesitan revisar los documentos.
+  reminds_recipients_who_havent_completed_their_part_yet_to_sign_following_the_reminders_schedule: Recuerda firmar a los destinatarios que aún no han completado su parte, según la programación de recordatorios.
+  signature_request_sms_sent_to_recipients_with_a_link_to_review_and_sign: SMS de solicitud de firma enviado a los destinatarios con un enlace para revisar y firmar.
+  phone_2fa_verification_text_message: Mensaje de texto de verificación 2FA por teléfono.
+  notification_email_sent_to_the_sender_user_and_bcc_addresses_once_the_submission_is_completed_by_all_parties: Correo de notificación enviado al usuario remitente y a las direcciones BCC una vez que todas las partes han completado el envío.
+  completed_documents_copy_email_sent_to_recipients_upon_completion_containing_their_documents: Correo con la copia de los documentos completados enviado a los destinatarios al finalizar, con sus documentos.
   form_custom_css: CSS personalizado del formulario
   subject: Asunto
   body: Cuerpo
@@ -1534,7 +1648,7 @@ es: &es
   back_to_active: Volver a activo
   submissions: Envíos
   templates: Plantillas
-  document_templates_html: Plantillas <span class="hidden md:inline">de documento</span>
+  document_templates_html: Plantillas <span class="hidden lg:inline">de documento</span>
   archived: Archivado
   search: Buscar
   submissions_not_found: Envíos no encontrados
@@ -1654,6 +1768,9 @@ es: &es
   there_are_no_signatures: No hay firmas
   signed_with_trusted_certificate: Firmado con certificado de confianza
   signed_with_external_certificate: Firmado con certificado externo
+  signature_valid: Firma válida
+  signature_verification_failed: Verificación de firma fallida
+  contains_unsigned_changes_after_the_last_signature: Contiene cambios no firmados después de la última firma
   setup_2fa_to_continue: Configura 2FA para continuar.
   create_a_new_account: Crear una nueva cuenta.
   you_are_already_signed_in: Ya has iniciado sesión.
@@ -1666,6 +1783,7 @@ es: &es
   form_has_been_archived: El formulario ha sido archivado.
   form_has_been_expired: El formulario ha expirado.
   form_has_been_declined: El formulario ha sido rechazado.
+  form_is_view_only: El formulario es de solo lectura.
   file_is_missing: Falta el archivo
   folder_name_has_been_updated: El nombre de la carpeta ha sido actualizado.
   unable_to_rename_folder: No se pudo renombrar la carpeta.
@@ -1750,6 +1868,10 @@ es: &es
   signers: Firmantes
   not_invited_yet: Aún no invitado
   not_completed_yet: Aún no completado
+  not_completed: No completado
+  not_viewed_yet: Aún no visto
+  not_viewed: No visto
+  viewed_on_time: 'Visto el %{time}'
   declined_on_time: 'Rechazado el %{time}'
   expire_on_time: 'Expira el %{time}'
   sign_in_person: Firma en persona
@@ -1971,6 +2093,7 @@ es: &es
   mobile: Móvil
   tablet: Tableta
   reset_default: Restablecer por defecto
+  smtp_settings_have_been_reset: La configuración SMTP ha sido restablecida.
   send_signature_request_email: Enviar correo de solicitud de firma
   last_3_months: Últimos 3 meses
   last_6_months: Últimos 6 meses
@@ -2001,6 +2124,7 @@ es: &es
   please_verify_your_email_address_to_continue: Por favor, verifica tu dirección de correo electrónico para continuar.
   verification_code_sent_click_link_or_enter_code: Se ha enviado un código de verificación a tu correo. Puedes hacer clic en el enlace del correo o ingresar el código a continuación.
   use_otp_code_to_verify_email_or_click_link_below_html: 'Usa el código <b>%{code}</b> para verificar tu correo electrónico o haz clic en el enlace a continuación:'
+  use_otp_code_to_verify_email_html: 'Usa el código <b>%{code}</b> para verificar tu correo electrónico:'
   verify_your_email: Verificar tu correo electrónico
   your_email_has_been_confirmed: Tu correo electrónico ha sido confirmado.
   invalid_or_expired_verification_code: Código de verificación inválido o expirado.
@@ -2016,6 +2140,7 @@ es: &es
   undo: Deshacer
   redo: Rehacer
   add_variable: Agregar variable
+  variable: Variable
   enter_a_url_or_variable_name: Ingrese una URL o nombre de variable
   new_token: Nuevo token
   token: Token
@@ -2050,6 +2175,7 @@ es: &es
     invite: Invitación
     link: Enlace
     mcp: MCP
+    self: Firma tú mismo
   submission_event_names:
     send_email_to_html: '<b>Correo electrónico enviado</b> a %{submitter_name}'
     bounce_email_html: '<b>Correo electrónico rebotado</b> %{submitter_name}'
@@ -2163,9 +2289,30 @@ es: &es
     submission_submitters: Lista de firmantes
     submission_link: Enlace del envío
     documents_link: Enlace de los documentos
+  date:
+    abbr_month_names:
+      -
+      - ene
+      - feb
+      - mar
+      - abr
+      - may
+      - jun
+      - jul
+      - ago
+      - sept
+      - oct
+      - nov
+      - dic
+    formats:
+      default: "%d/%m/%Y"
+      short: "%-d %b"
+      long: "%-d de %B de %Y"
   time:
     formats:
-      detailed: "%-d de %B de %Y %H:%M:%S"
+      short: "%-d %b, %-H:%M"
+      long: "%-d de %B de %Y a las %-H:%M"
+      detailed: "%-d de %B de %Y a las %-H:%M:%S"
 
 it: &it
   knowledge_based_authentication: Autenticazione basata sulla conoscenza
@@ -2194,6 +2341,27 @@ it: &it
   stripe_integration: Integrazione Stripe
   stripe_account_has_been_connected: L'account Stripe è stato collegato.
   re_connect_stripe: Ricollega Stripe
+  paypal_integration: Integrazione PayPal
+  paypal_account_has_been_connected: L'account PayPal è stato collegato.
+  re_connect_paypal: Ricollega PayPal
+  failed_to_connect_paypal_please_try_again: Impossibile collegare PayPal. Riprova.
+  paypal_connection_was_not_completed: La connessione con PayPal non è stata completata.
+  disconnecting_your_paypal_account_will_prevent_you_from_offering_paypal_services_and_products_on_your_website_do_you_wish_to_continue: La disconnessione del tuo account PayPal ti impedirà di offrire servizi e prodotti PayPal sul tuo sito web. Vuoi continuare?
+  attention_you_currently_cannot_receive_payments_due_to_restriction_on_your_paypal_account_please_reach_out_to_paypal_customer_support_or_connect_to_paypal_com_for_more_information: 'Attenzione: Al momento non puoi ricevere pagamenti a causa di una restrizione sul tuo account PayPal. Contatta l''Assistenza Clienti PayPal o visita https://www.paypal.com per maggiori informazioni.'
+  attention_please_confirm_your_email_address_on_paypal_com_in_order_to_receive_payments_you_currently_cannot_receive_payments: 'Attenzione: Conferma il tuo indirizzo email su https://www.paypal.com/businessprofile/settings per poter ricevere pagamenti! Al momento non puoi ricevere pagamenti.'
+  payment_receipt: Ricevuta di pagamento
+  amount_paid: Importo pagato
+  transaction: Transazione
+  transaction_id: ID transazione
+  order_id: ID ordine
+  payment_date: Data
+  paid_by: Pagato da
+  paid_to: Pagato a
+  business: Azienda
+  country: Paese
+  payer_id: ID pagatore
+  merchant_id: ID esercente
+  breakdown: Dettaglio
   private: Privato
   _variables: Variabili
   your_email_address_has_been_released_immediately_you_can_now_be_added_to_your_company_team_without_waiting_for_the_deletion_period_to_end: Il tuo indirizzo email è stato rilasciato immediatamente. Se stai per unirti a un team, ora puoi essere invitato nel team della tua azienda senza aspettare la fine del periodo di eliminazione.
@@ -2237,6 +2405,7 @@ it: &it
   you_have_been_invited_to_account_name_product_name_please_sign_up_using_the_link_below_: 'Sei stato invitato a %{account_name} %{product_name}. Registrati utilizzando il link qui sotto:'
   sent_using_product_name_in_testing_mode_html: 'Inviato utilizzando <a href="%{product_url}">%{product_name}</a> in Modalità di Test'
   sent_using_product_name_free_document_signing_html: 'Inviato utilizzando la firma di documenti gratuita di <a href="%{product_url}">%{product_name}</a>.'
+  sent_using_product_name_open_source_software_html: 'Inviato utilizzando il software open source di <a href="%{product_url}">%{product_name}</a>.'
   sent_with_docuseal_pro_html: 'Inviato con <a href="%{product_url}">OpenSeal Pro</a>'
   show_send_with_docuseal_pro_attribution_in_emails_html: Mostra la dicitura "Inviato con <span class="link">OpenSeal Pro</span>" nelle email
   sign_documents_with_trusted_certificate_provided_by_docu_seal_your_documents_and_data_are_never_shared_with_docu_seal_p_d_f_checksum_is_provided_to_generate_a_trusted_signature: "Firma documenti con un certificato di fiducia fornito da OpenSeal. I tuoi documenti e i tuoi dati non vengono mai condivisi con OpenSeal. Il checksum PDF è fornito per generare una firma di fiducia."
@@ -2244,15 +2413,19 @@ it: &it
   thanks: Grazie
   you_have_been_invited_to_submit_the_name_form: 'Sei stato invitato a inviare il modulo "%{name}".'
   you_have_been_invited_to_sign_the_name: 'Sei stato invitato a firmare il "%{name}".'
+  you_have_been_invited_to_view_the_name: 'Sei stato invitato a visualizzare il "%{name}".'
   alternatively_you_can_review_and_download_your_copy_using_the_link_below: "In alternativa, puoi rivedere e scaricare la tua copia utilizzando il link qui sotto:"
   please_check_the_copy_of_your_name_in_the_email_attachments: "Per favore, controlla la copia del tuo \"%{name}\" negli allegati dell'email."
   review_and_sign: Rivedi e Firma
+  view_document: Visualizza documento
   review_and_submit: Rivedi e Invia
   please_contact_us_by_replying_to_this_email_if_you_have_any_questions: "Per favore, contattaci rispondendo a questa email se hai domande."
   submitter_invitation_sms_body_sign: '{account.name} ti ha invitato a firmare un documento: {submitter.link}'
+  submitter_invitation_sms_body_view: '{account.name} ti ha invitato a visualizzare un documento: {submitter.link}'
   verification_code_sms_body: 'Codice di verifica: {code}'
   you_are_invited_to_submit_a_form: 'Sei stato invitato a inviare un modulo'
   you_are_invited_to_sign_a_document: 'Sei stato invitato a firmare un documento'
+  you_are_invited_to_view_a_document: 'Sei stato invitato a visualizzare un documento'
   you_are_invited_to_sign_documents: 'Sei stato invitato a firmare dei documenti'
   your_document_copy: 'La tua copia del documento'
   name_has_been_completed_by_submitters: '"%{name}" è stato completato da %{submitters}.'
@@ -2263,6 +2436,17 @@ it: &it
     Sei stato invitato a firmare il "{template.name}".
 
     [Rivedi e Firma]({submitter.link})
+
+    Per favore, contattaci rispondendo a questa email se hai domande.
+
+    Grazie,
+    {account.name}
+  submitter_invitation_email_view_body: |
+    Ciao,
+
+    Sei stato invitato a visualizzare il "{template.name}".
+
+    [Visualizza documento]({submitter.link})
 
     Per favore, contattaci rispondendo a questa email se hai domande.
 
@@ -2341,6 +2525,7 @@ it: &it
   profile_details: Dettagli del profilo
   sign_up_with_google: Registrati con Google
   sign_up_with_microsoft: Registrati con Microsoft
+  redirecting_to_provider: Reindirizzamento a %{provider}...
   by_creating_an_account_you_agree_to_our_html: 'Creando un account, accetti la nostra <a target="_blank" href="https://www.docuseal.com/privacy">Privacy Policy</a> e i nostri <a target="_blank" href="https://www.docuseal.com/terms">Termini di servizio</a>.'
   enter_email_to_continue: "Inserisci l'email per continuare"
   account: Account
@@ -2457,6 +2642,8 @@ it: &it
   invalid_timeserver: Server di timestamp non valido
   email_templates: Modelli email
   signature_request_email: Email di richiesta di firma
+  view_documents_email: Email di visualizzazione documenti
+  view_only: Sola lettura
   signature_request_reminder_email: Email di promemoria di richiesta di firma
   signature_request_sms: SMS di richiesta di firma
   verification_code_sms: SMS con codice di verifica
@@ -2466,6 +2653,13 @@ it: &it
   completed_form_message: Messaggio di completamento del modulo
   completed_form_redirect_button: Pulsante di reindirizzamento dopo il completamento del modulo
   documents_copy_email: Email con copia dei documenti
+  signature_request_email_sent_to_recipients_with_a_link_to_review_and_sign: Email di richiesta di firma inviata ai destinatari con un link per revisionare e firmare.
+  view_only_email_sent_to_recipients_that_need_to_only_review_the_documents: Email di sola lettura inviata ai destinatari che devono solo revisionare i documenti.
+  reminds_recipients_who_havent_completed_their_part_yet_to_sign_following_the_reminders_schedule: Ricorda di firmare ai destinatari che non hanno ancora completato la loro parte, in base alla pianificazione dei promemoria.
+  signature_request_sms_sent_to_recipients_with_a_link_to_review_and_sign: SMS di richiesta di firma inviato ai destinatari con un link per revisionare e firmare.
+  phone_2fa_verification_text_message: Messaggio di testo per la verifica 2FA tramite telefono.
+  notification_email_sent_to_the_sender_user_and_bcc_addresses_once_the_submission_is_completed_by_all_parties: Email di notifica inviata all'utente mittente e agli indirizzi BCC una volta che l'invio è stato completato da tutte le parti.
+  completed_documents_copy_email_sent_to_recipients_upon_completion_containing_their_documents: Email con la copia dei documenti completati inviata ai destinatari al completamento, con i loro documenti.
   form_custom_css: CSS personalizzato del modulo
   subject: Oggetto
   body: Corpo
@@ -2588,7 +2782,7 @@ it: &it
   back_to_active: Torna attivo
   submissions: Invii
   templates: Modelli
-  document_templates_html: Modelli <span class="hidden md:inline">di documento</span>
+  document_templates_html: Modelli <span class="hidden lg:inline">di documento</span>
   archived: Archiviato
   search: Cerca
   submissions_not_found: Invii non trovati
@@ -2708,6 +2902,9 @@ it: &it
   there_are_no_signatures: Non ci sono firme
   signed_with_trusted_certificate: Firmato con certificato affidabile
   signed_with_external_certificate: Firmato con certificato esterno
+  signature_valid: Firma valida
+  signature_verification_failed: Verifica della firma non riuscita
+  contains_unsigned_changes_after_the_last_signature: Contiene modifiche non firmate dopo l’ultima firma
   setup_2fa_to_continue: Configura 2FA per continuare.
   create_a_new_account: Crea un nuovo account.
   you_are_already_signed_in: "Hai già effettuato l'accesso."
@@ -2720,6 +2917,7 @@ it: &it
   form_has_been_archived: Il modulo è stato archiviato.
   form_has_been_expired: Il modulo è scaduto.
   form_has_been_declined: Il modulo è stato rifiutato.
+  form_is_view_only: Il modulo è di sola lettura.
   file_is_missing: File mancante
   folder_name_has_been_updated: Il nome della cartella è stato aggiornato.
   unable_to_rename_folder: Impossibile rinominare la cartella.
@@ -2804,6 +3002,10 @@ it: &it
   signers: Firmatari
   not_invited_yet: Non ancora invitato
   not_completed_yet: Non ancora completato
+  not_completed: Non completato
+  not_viewed_yet: Non ancora visualizzato
+  not_viewed: Non visualizzato
+  viewed_on_time: 'Visualizzato il %{time}'
   declined_on_time: 'Rifiutato il %{time}'
   expire_on_time: 'Scade il %{time}'
   sign_in_person: Firma di persona
@@ -3025,6 +3227,7 @@ it: &it
   mobile: Mobile
   tablet: Tablet
   reset_default: Reimposta predefinito
+  smtp_settings_have_been_reset: Le impostazioni SMTP sono state ripristinate.
   send_signature_request_email: Invia email di richiesta firma
   last_3_months: Ultimi 3 mesi
   last_6_months: Ultimi 6 mesi
@@ -3055,6 +3258,7 @@ it: &it
   please_verify_your_email_address_to_continue: Verifica il tuo indirizzo email per continuare.
   verification_code_sent_click_link_or_enter_code: "È stato inviato un codice di verifica alla tua email. Puoi cliccare il link nell'email o inserire il codice qui sotto."
   use_otp_code_to_verify_email_or_click_link_below_html: 'Usa il codice <b>%{code}</b> per verificare la tua email o clicca il link qui sotto:'
+  use_otp_code_to_verify_email_html: 'Usa il codice <b>%{code}</b> per verificare la tua email:'
   verify_your_email: Verifica la tua email
   your_email_has_been_confirmed: La tua email è stata confermata.
   invalid_or_expired_verification_code: Codice di verifica non valido o scaduto.
@@ -3070,6 +3274,7 @@ it: &it
   undo: Annulla
   redo: Ripeti
   add_variable: Aggiungi variabile
+  variable: Variabile
   enter_a_url_or_variable_name: Inserisci un URL o nome variabile
   new_token: Nuovo token
   token: Token
@@ -3104,6 +3309,7 @@ it: &it
     invite: Invito
     link: Link
     mcp: MCP
+    self: Firma te stesso
   submission_event_names:
     send_email_to_html: '<b>Email inviata</b> a %{submitter_name}'
     bounce_email_html: '<b>Email respinta</b> %{submitter_name}'
@@ -3217,9 +3423,16 @@ it: &it
     submission_submitters: Lista dei firmatari
     submission_link: Link dell'invio
     documents_link: Link dei documenti
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%-d %b"
+      long: "%-d %B %Y"
   time:
     formats:
-      detailed: "%d %B %Y %H:%M:%S"
+      short: "%-d %b, %H:%M"
+      long: "%-d %B %Y alle ore %H:%M"
+      detailed: "%-d %B %Y alle ore %H:%M:%S"
 
 fr: &fr
   knowledge_based_authentication: Authentification basée sur la connaissance
@@ -3248,6 +3461,27 @@ fr: &fr
   stripe_integration: Intégration Stripe
   stripe_account_has_been_connected: Le compte Stripe a été connecté.
   re_connect_stripe: Reconnecter Stripe
+  paypal_integration: Intégration PayPal
+  paypal_account_has_been_connected: Le compte PayPal a été connecté.
+  re_connect_paypal: Reconnecter PayPal
+  failed_to_connect_paypal_please_try_again: Échec de la connexion à PayPal. Veuillez réessayer.
+  paypal_connection_was_not_completed: La connexion à PayPal n'a pas été complétée.
+  disconnecting_your_paypal_account_will_prevent_you_from_offering_paypal_services_and_products_on_your_website_do_you_wish_to_continue: Déconnecter votre compte PayPal vous empêchera de proposer des services et produits PayPal sur votre site web. Voulez-vous continuer ?
+  attention_you_currently_cannot_receive_payments_due_to_restriction_on_your_paypal_account_please_reach_out_to_paypal_customer_support_or_connect_to_paypal_com_for_more_information: 'Attention : Vous ne pouvez actuellement pas recevoir de paiements en raison d''une restriction sur votre compte PayPal. Veuillez contacter le service client PayPal ou visiter https://www.paypal.com pour plus d''informations.'
+  attention_please_confirm_your_email_address_on_paypal_com_in_order_to_receive_payments_you_currently_cannot_receive_payments: 'Attention : Veuillez confirmer votre adresse e-mail sur https://www.paypal.com/businessprofile/settings afin de pouvoir recevoir des paiements ! Vous ne pouvez actuellement pas recevoir de paiements.'
+  payment_receipt: Reçu de paiement
+  amount_paid: Montant payé
+  transaction: Transaction
+  transaction_id: ID de transaction
+  order_id: ID de commande
+  payment_date: Date
+  paid_by: Payé par
+  paid_to: Payé à
+  business: Entreprise
+  country: Pays
+  payer_id: ID payeur
+  merchant_id: ID marchand
+  breakdown: Détail
   private: Privé
   _variables: Variables
   your_email_address_has_been_released_immediately_you_can_now_be_added_to_your_company_team_without_waiting_for_the_deletion_period_to_end: Votre adresse e-mail a été libérée immédiatement. Si vous rejoignez une équipe, vous pouvez maintenant être invité dans l'équipe de votre entreprise sans attendre la fin de la période de suppression.
@@ -3291,6 +3525,7 @@ fr: &fr
   you_have_been_invited_to_account_name_product_name_please_sign_up_using_the_link_below_: 'Vous avez été invité à %{account_name} %{product_name}. Veuillez vous inscrire en utilisant le lien ci-dessous :'
   sent_using_product_name_in_testing_mode_html: Envoyé avec <a href="%{product_url}">%{product_name}</a> en mode test
   sent_using_product_name_free_document_signing_html: Envoyé avec <a href="%{product_url}">%{product_name}</a> signature de documents gratuite.
+  sent_using_product_name_open_source_software_html: Envoyé avec le logiciel open source <a href="%{product_url}">%{product_name}</a>.
   sent_with_docuseal_pro_html: Envoyé avec <a href="%{product_url}">OpenSeal Pro</a>
   show_send_with_docuseal_pro_attribution_in_emails_html: Afficher l’attribution "Envoyé avec <span class="link">OpenSeal Pro</span>" dans les e‑mails
   sign_documents_with_trusted_certificate_provided_by_docu_seal_your_documents_and_data_are_never_shared_with_docu_seal_p_d_f_checksum_is_provided_to_generate_a_trusted_signature: Signez des documents avec un certificat de confiance fourni par OpenSeal. Vos documents et données ne sont jamais partagés avec OpenSeal. Une empreinte (checksum) PDF est fournie pour générer une signature de confiance.
@@ -3298,15 +3533,19 @@ fr: &fr
   thanks: Merci
   you_have_been_invited_to_submit_the_name_form: Vous avez été invité à soumettre le formulaire "%{name}".
   you_have_been_invited_to_sign_the_name: Vous avez été invité à signer "%{name}".
+  you_have_been_invited_to_view_the_name: Vous avez été invité à consulter "%{name}".
   alternatively_you_can_review_and_download_your_copy_using_the_link_below: 'Vous pouvez également consulter et télécharger votre exemplaire à l’aide du lien ci‑dessous :'
   please_check_the_copy_of_your_name_in_the_email_attachments: Veuillez vérifier la copie de votre "%{name}" dans les pièces jointes de l’e‑mail.
   review_and_sign: Examiner et signer
+  view_document: Consulter le document
   review_and_submit: Examiner et soumettre
   please_contact_us_by_replying_to_this_email_if_you_have_any_questions: Veuillez nous contacter en répondant à cet e‑mail si vous avez des questions.
   submitter_invitation_sms_body_sign: "{account.name} vous a invité à signer un document : {submitter.link}"
+  submitter_invitation_sms_body_view: "{account.name} vous a invité à consulter un document : {submitter.link}"
   verification_code_sms_body: 'Code de vérification : {code}'
   you_are_invited_to_submit_a_form: Vous êtes invité à soumettre un formulaire
   you_are_invited_to_sign_a_document: Vous êtes invité à signer un document
+  you_are_invited_to_view_a_document: Vous êtes invité à consulter un document
   you_are_invited_to_sign_documents: Vous êtes invité à signer des documents
   your_document_copy: Votre copie de document
   name_has_been_completed_by_submitters: '"%{name}" a été complété par %{submitters}.'
@@ -3319,6 +3558,17 @@ fr: &fr
     [Examiner et signer]({submitter.link})
 
     Veuillez nous contacter en répondant à cet e‑mail si vous avez des questions.
+
+    Merci,
+    {account.name}
+  submitter_invitation_email_view_body: |
+    Bonjour,
+
+    Vous avez été invité à consulter "{template.name}".
+
+    [Consulter le document]({submitter.link})
+
+    Veuillez nous contacter en répondant à cet e-mail si vous avez des questions.
 
     Merci,
     {account.name}
@@ -3395,6 +3645,7 @@ fr: &fr
   profile_details: Détails du profil
   sign_up_with_google: S’inscrire avec Google
   sign_up_with_microsoft: S’inscrire avec Microsoft
+  redirecting_to_provider: Redirection vers %{provider}...
   by_creating_an_account_you_agree_to_our_html: En créant un compte, vous acceptez notre <a target="_blank" href="https://www.docuseal.com/privacy">Politique de confidentialité</a> et nos <a target="_blank" href="https://www.docuseal.com/terms">Conditions d’utilisation</a>.
   enter_email_to_continue: Entrez votre e‑mail pour continuer
   account: Compte
@@ -3511,6 +3762,8 @@ fr: &fr
   invalid_timeserver: Serveur d’horodatage invalide
   email_templates: Modèles d’e‑mail
   signature_request_email: E‑mail de demande de signature
+  view_documents_email: E-mail de consultation des documents
+  view_only: Lecture seule
   signature_request_reminder_email: E‑mail de rappel de demande de signature
   signature_request_sms: SMS de demande de signature
   verification_code_sms: SMS de code de vérification
@@ -3520,6 +3773,13 @@ fr: &fr
   completed_form_message: Message de formulaire complété
   completed_form_redirect_button: Bouton de redirection après finalisation
   documents_copy_email: E‑mail avec copie des documents
+  signature_request_email_sent_to_recipients_with_a_link_to_review_and_sign: E-mail de demande de signature envoyé aux destinataires avec un lien pour consulter et signer.
+  view_only_email_sent_to_recipients_that_need_to_only_review_the_documents: E-mail en lecture seule envoyé aux destinataires qui doivent uniquement consulter les documents.
+  reminds_recipients_who_havent_completed_their_part_yet_to_sign_following_the_reminders_schedule: Rappelle de signer aux destinataires qui n'ont pas encore terminé leur partie, selon la planification des rappels.
+  signature_request_sms_sent_to_recipients_with_a_link_to_review_and_sign: SMS de demande de signature envoyé aux destinataires avec un lien pour consulter et signer.
+  phone_2fa_verification_text_message: Message texte de vérification 2FA par téléphone.
+  notification_email_sent_to_the_sender_user_and_bcc_addresses_once_the_submission_is_completed_by_all_parties: E-mail de notification envoyé à l'utilisateur expéditeur et aux adresses Cci une fois la soumission complétée par toutes les parties.
+  completed_documents_copy_email_sent_to_recipients_upon_completion_containing_their_documents: E-mail avec la copie des documents finalisés, envoyé aux destinataires à la finalisation, contenant leurs documents.
   form_custom_css: CSS personnalisé du formulaire
   subject: Objet
   body: Corps
@@ -3642,7 +3902,7 @@ fr: &fr
   back_to_active: Retour aux actifs
   submissions: Soumissions
   templates: Modèles
-  document_templates_html: Modèles <span class="hidden md:inline">de documents</span>
+  document_templates_html: Modèles <span class="hidden lg:inline">de documents</span>
   archived: Archivé
   search: Rechercher
   submissions_not_found: Soumissions introuvables
@@ -3762,6 +4022,9 @@ fr: &fr
   there_are_no_signatures: Il n’y a pas de signatures
   signed_with_trusted_certificate: Signé avec un certificat de confiance
   signed_with_external_certificate: Signé avec un certificat externe
+  signature_valid: Signature valide
+  signature_verification_failed: Échec de la vérification de la signature
+  contains_unsigned_changes_after_the_last_signature: Contient des modifications non signées après la dernière signature
   setup_2fa_to_continue: Configurez la 2FA pour continuer.
   create_a_new_account: Créer un nouveau compte.
   you_are_already_signed_in: Vous êtes déjà connecté.
@@ -3774,6 +4037,7 @@ fr: &fr
   form_has_been_archived: Le formulaire a été archivé.
   form_has_been_expired: Le formulaire a expiré.
   form_has_been_declined: Le formulaire a été refusé.
+  form_is_view_only: Le formulaire est en lecture seule.
   file_is_missing: Fichier manquant
   folder_name_has_been_updated: Le nom du dossier a été mis à jour.
   unable_to_rename_folder: Impossible de renommer le dossier.
@@ -3858,6 +4122,10 @@ fr: &fr
   signers: Signataires
   not_invited_yet: Pas encore invité
   not_completed_yet: Pas encore terminé
+  not_completed: Non terminé
+  not_viewed_yet: Pas encore consulté
+  not_viewed: Non consulté
+  viewed_on_time: Consulté le %{time}
   declined_on_time: Refusé le %{time}
   expire_on_time: Expire le %{time}
   sign_in_person: Signer en personne
@@ -4075,6 +4343,7 @@ fr: &fr
   mobile: Mobile
   tablet: Tablette
   reset_default: Réinitialiser par défaut
+  smtp_settings_have_been_reset: Les paramètres SMTP ont été réinitialisés.
   send_signature_request_email: Envoyer un e-mail de demande de signature
   last_month: Mois dernier
   last_3_months: 3 derniers mois
@@ -4106,6 +4375,7 @@ fr: &fr
   please_verify_your_email_address_to_continue: "Veuillez vérifier votre adresse e-mail pour continuer."
   verification_code_sent_click_link_or_enter_code: "Un code de vérification a été envoyé à votre adresse e-mail. Vous pouvez cliquer sur le lien dans l'e-mail ou saisir le code ci-dessous."
   use_otp_code_to_verify_email_or_click_link_below_html: "Utilisez le code <b>%{code}</b> pour vérifier votre e-mail ou cliquez sur le lien ci-dessous :"
+  use_otp_code_to_verify_email_html: "Utilisez le code <b>%{code}</b> pour vérifier votre e-mail :"
   verify_your_email: "Vérifier votre e-mail"
   your_email_has_been_confirmed: "Votre adresse e-mail a été confirmée."
   invalid_or_expired_verification_code: "Code de vérification invalide ou expiré."
@@ -4121,6 +4391,7 @@ fr: &fr
   undo: Annuler
   redo: Rétablir
   add_variable: Ajouter une variable
+  variable: Variable
   enter_a_url_or_variable_name: Entrez une URL ou un nom de variable
   new_token: Nouveau jeton
   token: Jeton
@@ -4155,6 +4426,7 @@ fr: &fr
     invite: Invitation
     link: Lien
     mcp: MCP
+    self: Signer vous-même
   submission_event_names:
     send_email_to_html: "<b>E‑mail envoyé</b> à %{submitter_name}"
     bounce_email_html: "<b>E‑mail rejeté</b> %{submitter_name}"
@@ -4268,9 +4540,29 @@ fr: &fr
     submission_submitters: Liste des signataires
     submission_link: Lien de la soumission
     documents_link: Lien des documents
+  date:
+    abbr_month_names:
+      -
+      - janv.
+      - févr.
+      - mars
+      - avr.
+      - mai
+      - juin
+      - juil.
+      - août
+      - sept.
+      - oct.
+      - nov.
+      - déc.
+    formats:
+      short: "%-d %b"
+      long: "%-d %B %Y"
   time:
     formats:
-      detailed: "%A %d %B %Y %Hh%Mm%Ss"
+      short: "%-d %b, %H:%M"
+      long: "%-d %B %Y à %H:%M"
+      detailed: "%-d %B %Y à %H:%M:%S"
 
 pt: &pt
   knowledge_based_authentication: Autenticação baseada em conhecimento
@@ -4299,6 +4591,27 @@ pt: &pt
   stripe_integration: Integração com Stripe
   stripe_account_has_been_connected: Conta Stripe foi conectada.
   re_connect_stripe: Reconectar Stripe
+  paypal_integration: Integração com PayPal
+  paypal_account_has_been_connected: Conta PayPal foi conectada.
+  re_connect_paypal: Reconectar PayPal
+  failed_to_connect_paypal_please_try_again: Falha ao conectar PayPal. Tente novamente.
+  paypal_connection_was_not_completed: A conexão com PayPal não foi concluída.
+  disconnecting_your_paypal_account_will_prevent_you_from_offering_paypal_services_and_products_on_your_website_do_you_wish_to_continue: Desconectar sua conta PayPal impedirá que você ofereça serviços e produtos PayPal no seu site. Deseja continuar?
+  attention_you_currently_cannot_receive_payments_due_to_restriction_on_your_paypal_account_please_reach_out_to_paypal_customer_support_or_connect_to_paypal_com_for_more_information: 'Atenção: No momento você não pode receber pagamentos devido a uma restrição na sua conta PayPal. Entre em contato com o Suporte ao Cliente PayPal ou acesse https://www.paypal.com para mais informações.'
+  attention_please_confirm_your_email_address_on_paypal_com_in_order_to_receive_payments_you_currently_cannot_receive_payments: 'Atenção: Por favor, confirme seu endereço de e-mail em https://www.paypal.com/businessprofile/settings para poder receber pagamentos! No momento você não pode receber pagamentos.'
+  payment_receipt: Recibo de pagamento
+  amount_paid: Valor pago
+  transaction: Transação
+  transaction_id: ID da transação
+  order_id: ID do pedido
+  payment_date: Data
+  paid_by: Pago por
+  paid_to: Pago a
+  business: Empresa
+  country: País
+  payer_id: ID do pagador
+  merchant_id: ID do comerciante
+  breakdown: Detalhamento
   private: Privado
   _variables: Variáveis
   your_email_address_has_been_released_immediately_you_can_now_be_added_to_your_company_team_without_waiting_for_the_deletion_period_to_end: Seu endereço de e-mail foi liberado imediatamente. Se você estiver entrando em uma equipe, agora pode ser convidado para a equipe da sua empresa sem esperar o fim do período de exclusão.
@@ -4342,6 +4655,7 @@ pt: &pt
   you_have_been_invited_to_account_name_product_name_please_sign_up_using_the_link_below_: 'Você foi convidado para %{account_name} %{product_name}. Inscreva-se usando o link abaixo:'
   sent_using_product_name_in_testing_mode_html: 'Enviado usando <a href="%{product_url}">%{product_name}</a> no Modo de Teste'
   sent_using_product_name_free_document_signing_html: 'Enviado usando a assinatura gratuita de documentos de <a href="%{product_url}">%{product_name}</a>.'
+  sent_using_product_name_open_source_software_html: 'Enviado usando o software de código aberto <a href="%{product_url}">%{product_name}</a>.'
   sent_with_docuseal_pro_html: 'Enviado com <a href="%{product_url}">OpenSeal Pro</a>'
   show_send_with_docuseal_pro_attribution_in_emails_html: Mostrar "Enviado com <span class="link">OpenSeal Pro</span>" nos e-mails
   sign_documents_with_trusted_certificate_provided_by_docu_seal_your_documents_and_data_are_never_shared_with_docu_seal_p_d_f_checksum_is_provided_to_generate_a_trusted_signature: Assine documentos com certificado confiável fornecido pela OpenSeal. Seus documentos e dados nunca são compartilhados com a OpenSeal. O checksum do PDF é fornecido para gerar uma assinatura confiável.
@@ -4349,15 +4663,19 @@ pt: &pt
   thanks: Obrigado
   you_have_been_invited_to_submit_the_name_form: 'Você foi convidado a submeter o formulário "%{name}".'
   you_have_been_invited_to_sign_the_name: 'Você foi convidado a assinar "%{name}".'
+  you_have_been_invited_to_view_the_name: 'Você foi convidado a visualizar "%{name}".'
   alternatively_you_can_review_and_download_your_copy_using_the_link_below: 'Você pode revisar e baixar sua cópia usando o link abaixo:'
   please_check_the_copy_of_your_name_in_the_email_attachments: 'Por favor, verifique a cópia de "%{name}" nos anexos do e-mail.'
   review_and_sign: Revisar e assinar
+  view_document: Visualizar documento
   review_and_submit: Revisar e submeter
   please_contact_us_by_replying_to_this_email_if_you_have_any_questions: 'Por favor, entre em contato conosco respondendo a este e-mail se você tiver alguma dúvida.'
   submitter_invitation_sms_body_sign: '{account.name} convidou você para assinar um documento: {submitter.link}'
+  submitter_invitation_sms_body_view: '{account.name} convidou você para visualizar um documento: {submitter.link}'
   verification_code_sms_body: 'Código de verificação: {code}'
   you_are_invited_to_submit_a_form: Você foi convidado a submeter um formulário
   you_are_invited_to_sign_a_document: Você foi convidado a assinar um documento
+  you_are_invited_to_view_a_document: Você foi convidado a visualizar um documento
   you_are_invited_to_sign_documents: Você foi convidado a assinar documentos
   your_document_copy: Sua cópia do documento
   name_has_been_completed_by_submitters: '"%{name}" foi concluído por %{submitters}.'
@@ -4368,6 +4686,17 @@ pt: &pt
     Você foi convidado a assinar "{template.name}".
 
     [Revisar e assinar]({submitter.link})
+
+    Por favor, entre em contato conosco respondendo a este e-mail se você tiver alguma dúvida.
+
+    Obrigado,
+    {account.name}
+  submitter_invitation_email_view_body: |
+    Olá,
+
+    Você foi convidado a visualizar "{template.name}".
+
+    [Visualizar documento]({submitter.link})
 
     Por favor, entre em contato conosco respondendo a este e-mail se você tiver alguma dúvida.
 
@@ -4446,6 +4775,7 @@ pt: &pt
   profile_details: Detalhes do perfil
   sign_up_with_google: Inscrever-se com Google
   sign_up_with_microsoft: Inscrever-se com Microsoft
+  redirecting_to_provider: Redirecionando para %{provider}...
   by_creating_an_account_you_agree_to_our_html: 'Ao criar uma conta, você concorda com nossa <a target="_blank" href="https://www.docuseal.com/privacy">Política de Privacidade</a> e <a target="_blank" href="https://www.docuseal.com/terms">Termos de Serviço</a>.'
   enter_email_to_continue: Insira o e-mail para continuar
   account: Conta
@@ -4562,6 +4892,8 @@ pt: &pt
   invalid_timeserver: Servidor de carimbo de tempo inválido
   email_templates: Modelos de e-mail
   signature_request_email: E-mail de solicitação de assinatura
+  view_documents_email: E-mail de visualização de documentos
+  view_only: Somente leitura
   signature_request_reminder_email: E-mail de lembrete de solicitação de assinatura
   signature_request_sms: SMS de solicitação de assinatura
   verification_code_sms: SMS com código de verificação
@@ -4571,6 +4903,13 @@ pt: &pt
   completed_form_message: Mensagem de formulário concluído
   completed_form_redirect_button: Botão de redirecionamento do formulário concluído
   documents_copy_email: E-mail com cópia dos documentos
+  signature_request_email_sent_to_recipients_with_a_link_to_review_and_sign: E-mail de solicitação de assinatura enviado aos destinatários com um link para revisar e assinar.
+  view_only_email_sent_to_recipients_that_need_to_only_review_the_documents: E-mail somente de leitura enviado aos destinatários que precisam apenas revisar os documentos.
+  reminds_recipients_who_havent_completed_their_part_yet_to_sign_following_the_reminders_schedule: Lembra os destinatários que ainda não concluíram a sua parte de assinar, de acordo com o agendamento de lembretes.
+  signature_request_sms_sent_to_recipients_with_a_link_to_review_and_sign: SMS de solicitação de assinatura enviado aos destinatários com um link para revisar e assinar.
+  phone_2fa_verification_text_message: Mensagem de texto de verificação 2FA por telefone.
+  notification_email_sent_to_the_sender_user_and_bcc_addresses_once_the_submission_is_completed_by_all_parties: E-mail de notificação enviado ao usuário remetente e aos endereços BCC assim que a submissão for concluída por todas as partes.
+  completed_documents_copy_email_sent_to_recipients_upon_completion_containing_their_documents: E-mail com a cópia dos documentos concluídos enviado aos destinatários na conclusão, com os seus documentos.
   form_custom_css: CSS personalizado do formulário
   subject: Assunto
   body: Corpo
@@ -4693,7 +5032,7 @@ pt: &pt
   back_to_active: Voltar para ativo
   submissions: Submissões
   templates: Modelos
-  document_templates_html: Modelos <span class="hidden md:inline">de documento</span>
+  document_templates_html: Modelos <span class="hidden lg:inline">de documento</span>
   archived: Arquivado
   search: Buscar
   submissions_not_found: Submissões não encontradas
@@ -4813,6 +5152,9 @@ pt: &pt
   there_are_no_signatures: Não há assinaturas
   signed_with_trusted_certificate: Assinado com certificado confiável
   signed_with_external_certificate: Assinado com certificado externo
+  signature_valid: Assinatura válida
+  signature_verification_failed: Falha na verificação da assinatura
+  contains_unsigned_changes_after_the_last_signature: Contém alterações não assinadas após a última assinatura
   setup_2fa_to_continue: Configure 2FA para continuar.
   create_a_new_account: Criar uma nova conta.
   you_are_already_signed_in: Você já está conectado.
@@ -4825,6 +5167,7 @@ pt: &pt
   form_has_been_archived: O formulário foi arquivado.
   form_has_been_expired: O formulário expirou.
   form_has_been_declined: O formulário foi recusado.
+  form_is_view_only: O formulário é somente leitura.
   file_is_missing: O arquivo está ausente
   folder_name_has_been_updated: O nome da pasta foi atualizado.
   unable_to_rename_folder: Não foi possível renomear a pasta.
@@ -4909,6 +5252,10 @@ pt: &pt
   signers: Signatários
   not_invited_yet: Ainda não convidado
   not_completed_yet: Ainda não concluído
+  not_completed: Não concluído
+  not_viewed_yet: Ainda não visualizado
+  not_viewed: Não visualizado
+  viewed_on_time: 'Visualizado em %{time}'
   declined_on_time: 'Recusado em %{time}'
   expire_on_time: 'Expira em %{time}'
   sign_in_person: Assinar pessoalmente
@@ -5130,6 +5477,7 @@ pt: &pt
   mobile: Celular
   tablet: Tablet
   reset_default: Redefinir para padrão
+  smtp_settings_have_been_reset: As configurações SMTP foram redefinidas.
   send_signature_request_email: Enviar e-mail de solicitação de assinatura
   last_3_months: Últimos 3 meses
   last_6_months: Últimos 6 meses
@@ -5160,6 +5508,7 @@ pt: &pt
   please_verify_your_email_address_to_continue: Verifique seu endereço de e-mail para continuar.
   verification_code_sent_click_link_or_enter_code: Um código de verificação foi enviado para seu e-mail. Você pode clicar no link do e-mail ou inserir o código abaixo.
   use_otp_code_to_verify_email_or_click_link_below_html: 'Use o código <b>%{code}</b> para verificar seu e-mail ou clique no link abaixo:'
+  use_otp_code_to_verify_email_html: 'Use o código <b>%{code}</b> para verificar seu e-mail:'
   verify_your_email: Verificar seu e-mail
   your_email_has_been_confirmed: Seu e-mail foi confirmado.
   invalid_or_expired_verification_code: Código de verificação inválido ou expirado.
@@ -5175,6 +5524,7 @@ pt: &pt
   undo: Desfazer
   redo: Refazer
   add_variable: Adicionar variável
+  variable: Variável
   enter_a_url_or_variable_name: Digite uma URL ou nome de variável
   new_token: Novo token
   token: Token
@@ -5209,6 +5559,7 @@ pt: &pt
     invite: Convite
     link: Link
     mcp: MCP
+    self: Assine você mesmo
   submission_event_names:
     send_email_to_html: '<b>Email enviado</b> para %{submitter_name}'
     bounce_email_html: '<b>Email não entregue</b> %{submitter_name}'
@@ -5322,9 +5673,29 @@ pt: &pt
     submission_submitters: Lista de signatários
     submission_link: Link da submissão
     documents_link: Link dos documentos
+  date:
+    abbr_month_names:
+      -
+      - jan.
+      - fev.
+      - mar.
+      - abr.
+      - mai.
+      - jun.
+      - jul.
+      - ago.
+      - set.
+      - out.
+      - nov.
+      - dez.
+    formats:
+      short: "%-d de %b"
+      long: "%-d de %B de %Y"
   time:
     formats:
-      detailed: "%A, %d de %B de %Y, %H:%M:%Sh"
+      short: "%-d de %b, %H:%M"
+      long: "%-d de %B de %Y às %H:%M"
+      detailed: "%-d de %B de %Y às %H:%M:%S"
 
 de: &de
   knowledge_based_authentication: Wissensbasierte Authentifizierung
@@ -5363,6 +5734,27 @@ de: &de
   require_all_recipients: Alle Empfänger verpflichten
   stripe_account_has_been_connected: Stripe-Konto wurde verbunden.
   re_connect_stripe: Stripe erneut verbinden
+  paypal_integration: PayPal-Integration
+  paypal_account_has_been_connected: PayPal-Konto wurde verbunden.
+  re_connect_paypal: PayPal erneut verbinden
+  failed_to_connect_paypal_please_try_again: PayPal konnte nicht verbunden werden. Bitte erneut versuchen.
+  paypal_connection_was_not_completed: Die PayPal-Verbindung wurde nicht abgeschlossen.
+  disconnecting_your_paypal_account_will_prevent_you_from_offering_paypal_services_and_products_on_your_website_do_you_wish_to_continue: Das Trennen Ihres PayPal-Kontos verhindert, dass Sie PayPal-Dienste und -Produkte auf Ihrer Website anbieten können. Möchten Sie fortfahren?
+  attention_you_currently_cannot_receive_payments_due_to_restriction_on_your_paypal_account_please_reach_out_to_paypal_customer_support_or_connect_to_paypal_com_for_more_information: 'Achtung: Sie können derzeit aufgrund einer Einschränkung Ihres PayPal-Kontos keine Zahlungen empfangen. Bitte wenden Sie sich an den PayPal-Kundenservice oder besuchen Sie https://www.paypal.com für weitere Informationen.'
+  attention_please_confirm_your_email_address_on_paypal_com_in_order_to_receive_payments_you_currently_cannot_receive_payments: 'Achtung: Bitte bestätigen Sie Ihre E-Mail-Adresse auf https://www.paypal.com/businessprofile/settings, um Zahlungen empfangen zu können! Sie können derzeit keine Zahlungen empfangen.'
+  payment_receipt: Zahlungsbeleg
+  amount_paid: Gezahlter Betrag
+  transaction: Transaktion
+  transaction_id: Transaktions-ID
+  order_id: Bestell-ID
+  payment_date: Datum
+  paid_by: Gezahlt von
+  paid_to: Gezahlt an
+  business: Unternehmen
+  country: Land
+  payer_id: Zahler-ID
+  merchant_id: Händler-ID
+  breakdown: Aufschlüsselung
   bcc_recipients: BCC-Empfänger
   resend_pending: Ausstehende erneut versenden
   always_enforce_signing_order: Reihenfolge der Unterschriften immer erzwingen
@@ -5396,21 +5788,26 @@ de: &de
   you_have_been_invited_to_account_name_product_name_please_sign_up_using_the_link_below_: 'Sie wurden zu %{account_name} %{product_name} eingeladen. Bitte registrieren Sie sich über den folgenden Link:'
   sent_using_product_name_in_testing_mode_html: 'Gesendet über <a href="%{product_url}">%{product_name}</a> im Testmodus'
   sent_using_product_name_free_document_signing_html: 'Gesendet mit der kostenlosen Dokumentensignierung von <a href="%{product_url}">%{product_name}</a>.'
+  sent_using_product_name_open_source_software_html: 'Gesendet mit der Open-Source-Software von <a href="%{product_url}">%{product_name}</a>.'
   sent_with_docuseal_pro_html: Gesendet mit <a href="%{product_url}">OpenSeal Pro</a>
   show_send_with_docuseal_pro_attribution_in_emails_html: '"Gesendet mit <span class="link">OpenSeal Pro</span>" in E-Mails anzeigen'
   sign_documents_with_trusted_certificate_provided_by_docu_seal_your_documents_and_data_are_never_shared_with_docu_seal_p_d_f_checksum_is_provided_to_generate_a_trusted_signature: Unterzeichnen Sie Dokumente mit einem vertrauenswürdigen Zertifikat von OpenSeal. Ihre Dokumente und Daten werden niemals mit OpenSeal geteilt. Eine PDF-Prüfsumme wird bereitgestellt, um eine vertrauenswürdige Signatur zu generieren.
   you_have_been_invited_to_submit_the_name_form: 'Sie wurden eingeladen, das Formular "%{name}" einzureichen.'
   you_have_been_invited_to_sign_the_name: 'Sie wurden eingeladen, "%{name}" zu unterschreiben.'
+  you_have_been_invited_to_view_the_name: 'Sie wurden eingeladen, "%{name}" anzusehen.'
   alternatively_you_can_review_and_download_your_copy_using_the_link_below: 'Alternativ können Sie Ihre Kopie über den untenstehenden Link ansehen und herunterladen:'
   please_check_the_copy_of_your_name_in_the_email_attachments: 'Bitte prüfen Sie die Kopie von "%{name}" im E-Mail-Anhang.'
   awaiting_completion_by_the_other_party: "Warten auf die Fertigstellung durch die andere Partei"
   review_and_sign: Prüfen und unterschreiben
+  view_document: Dokument ansehen
   review_and_submit: Prüfen und einreichen
   please_contact_us_by_replying_to_this_email_if_you_have_any_questions: 'Bitte kontaktieren Sie uns, indem Sie auf diese E-Mail antworten, falls Sie Fragen haben.'
   submitter_invitation_sms_body_sign: '{account.name} hat Sie eingeladen, ein Dokument zu unterschreiben: {submitter.link}'
+  submitter_invitation_sms_body_view: '{account.name} hat Sie eingeladen, ein Dokument anzusehen: {submitter.link}'
   verification_code_sms_body: 'Verifizierungscode: {code}'
   you_are_invited_to_submit_a_form: Sie sind eingeladen, ein Formular einzureichen
   you_are_invited_to_sign_a_document: Sie sind eingeladen, ein Dokument zu unterschreiben
+  you_are_invited_to_view_a_document: Sie sind eingeladen, ein Dokument anzusehen
   you_are_invited_to_sign_documents: Sie sind eingeladen, Dokumente zu unterschreiben
   your_document_copy: Ihre Dokumentkopie
   name_has_been_completed_by_submitters: '"%{name}" wurde von %{submitters} abgeschlossen.'
@@ -5421,6 +5818,17 @@ de: &de
     Sie wurden eingeladen, "{template.name}" zu unterschreiben.
 
     [Prüfen und unterschreiben]({submitter.link})
+
+    Bitte kontaktieren Sie uns, indem Sie auf diese E-Mail antworten, falls Sie Fragen haben.
+
+    Danke,
+    {account.name}
+  submitter_invitation_email_view_body: |
+    Hallo,
+
+    Sie wurden eingeladen, "{template.name}" anzusehen.
+
+    [Dokument ansehen]({submitter.link})
 
     Bitte kontaktieren Sie uns, indem Sie auf diese E-Mail antworten, falls Sie Fragen haben.
 
@@ -5500,6 +5908,7 @@ de: &de
   profile_details: Profildetails
   sign_up_with_google: Mit Google registrieren
   sign_up_with_microsoft: Mit Microsoft registrieren
+  redirecting_to_provider: Weiterleitung zu %{provider}...
   by_creating_an_account_you_agree_to_our_html: 'Durch die Erstellung eines Kontos stimmen Sie unseren <a target="_blank" href="https://www.docuseal.com/privacy">Datenschutzrichtlinien</a> und <a target="_blank" href="https://www.docuseal.com/terms">Nutzungsbedingungen</a> zu.'
   enter_email_to_continue: E-Mail eingeben, um fortzufahren
   account: Konto
@@ -5616,6 +6025,8 @@ de: &de
   invalid_timeserver: Ungültiger Zeitstempelserver
   email_templates: E-Mail-Vorlagen
   signature_request_email: E-Mail für Signaturanfrage
+  view_documents_email: E-Mail zur Dokumentenansicht
+  view_only: Nur Ansicht
   signature_request_reminder_email: E-Mail-Erinnerung für Signaturanfrage
   signature_request_sms: SMS für Signaturanfrage
   verification_code_sms: SMS mit Verifizierungscode
@@ -5625,6 +6036,13 @@ de: &de
   completed_form_message: Nachricht zum abgeschlossenen Formular
   completed_form_redirect_button: Weiterleitungsschaltfläche nach Formularabschluss
   documents_copy_email: E-Mail mit Dokumentenkopie
+  signature_request_email_sent_to_recipients_with_a_link_to_review_and_sign: E-Mail mit der Signaturanfrage, die mit einem Link zum Prüfen und Signieren an die Empfänger gesendet wird.
+  view_only_email_sent_to_recipients_that_need_to_only_review_the_documents: E-Mail nur zur Ansicht, die an Empfänger gesendet wird, die die Dokumente nur prüfen müssen.
+  reminds_recipients_who_havent_completed_their_part_yet_to_sign_following_the_reminders_schedule: Erinnert Empfänger, die ihren Teil noch nicht abgeschlossen haben, an das Signieren, gemäß dem Erinnerungszeitplan.
+  signature_request_sms_sent_to_recipients_with_a_link_to_review_and_sign: SMS mit der Signaturanfrage, die mit einem Link zum Prüfen und Signieren an die Empfänger gesendet wird.
+  phone_2fa_verification_text_message: Textnachricht zur 2FA-Verifizierung per Telefon.
+  notification_email_sent_to_the_sender_user_and_bcc_addresses_once_the_submission_is_completed_by_all_parties: Benachrichtigungs-E-Mail, die an den absendenden Benutzer und die BCC-Adressen gesendet wird, sobald die Einreichung von allen Parteien abgeschlossen wurde.
+  completed_documents_copy_email_sent_to_recipients_upon_completion_containing_their_documents: E-Mail mit der Kopie der abgeschlossenen Dokumente, die nach Abschluss an die Empfänger gesendet wird.
   form_custom_css: Benutzerdefiniertes CSS für Formular
   subject: Betreff
   body: Inhalt
@@ -5747,7 +6165,7 @@ de: &de
   back_to_active: Zurück zu Aktiv
   submissions: Einreichungen
   templates: Vorlagen
-  document_templates_html: <span class="md:hidden">Vorlagen</span><span class="hidden md:inline">Dokumentvorlagen</span>
+  document_templates_html: <span class="lg:hidden">Vorlagen</span><span class="hidden lg:inline">Dokumentvorlagen</span>
   archived: Archiviert
   search: Suchen
   submissions_not_found: Einreichungen nicht gefunden
@@ -5867,6 +6285,9 @@ de: &de
   there_are_no_signatures: Es gibt keine Unterschriften
   signed_with_trusted_certificate: Signiert mit vertrauenswürdigem Zertifikat
   signed_with_external_certificate: Signiert mit externem Zertifikat
+  signature_valid: Signatur gültig
+  signature_verification_failed: Signaturprüfung fehlgeschlagen
+  contains_unsigned_changes_after_the_last_signature: Enthält nicht signierte Änderungen nach der letzten Signatur
   setup_2fa_to_continue: Richten Sie 2FA ein, um fortzufahren.
   create_a_new_account: Neues Konto erstellen.
   you_are_already_signed_in: Sie sind bereits angemeldet.
@@ -5879,6 +6300,7 @@ de: &de
   form_has_been_archived: Das Formular wurde archiviert.
   form_has_been_expired: Das Formular ist abgelaufen.
   form_has_been_declined: Das Formular wurde abgelehnt.
+  form_is_view_only: Das Formular ist schreibgeschützt.
   file_is_missing: Datei fehlt
   folder_name_has_been_updated: Der Ordnername wurde aktualisiert.
   unable_to_rename_folder: Der Ordner konnte nicht umbenannt werden.
@@ -5963,6 +6385,10 @@ de: &de
   signers: Unterzeichner
   not_invited_yet: Noch nicht eingeladen
   not_completed_yet: Noch nicht abgeschlossen
+  not_completed: Nicht abgeschlossen
+  not_viewed_yet: Noch nicht angesehen
+  not_viewed: Nicht angesehen
+  viewed_on_time: 'Angesehen am %{time}'
   declined_on_time: 'Abgelehnt am %{time}'
   expire_on_time: 'Läuft ab am %{time}'
   sign_in_person: Vor Ort unterschreiben
@@ -6184,6 +6610,7 @@ de: &de
   mobile: Mobil
   tablet: Tablet
   reset_default: Standard zurücksetzen
+  smtp_settings_have_been_reset: Die SMTP-Einstellungen wurden zurückgesetzt.
   send_signature_request_email: Signaturanfrage-E-Mail senden
   last_3_months: Letzte 3 Monate
   last_6_months: Letzte 6 Monate
@@ -6214,6 +6641,7 @@ de: &de
   please_verify_your_email_address_to_continue: Bitte bestätigen Sie Ihre E-Mail-Adresse, um fortzufahren.
   verification_code_sent_click_link_or_enter_code: Ein Verifizierungscode wurde an Ihre E-Mail gesendet. Sie können auf den Link in der E-Mail klicken oder den Code unten eingeben.
   use_otp_code_to_verify_email_or_click_link_below_html: 'Verwenden Sie den Code <b>%{code}</b>, um Ihre E-Mail zu bestätigen, oder klicken Sie auf den Link unten:'
+  use_otp_code_to_verify_email_html: 'Verwenden Sie den Code <b>%{code}</b>, um Ihre E-Mail zu bestätigen:'
   verify_your_email: E-Mail bestätigen
   your_email_has_been_confirmed: Ihre E-Mail-Adresse wurde bestätigt.
   invalid_or_expired_verification_code: Ungültiger oder abgelaufener Verifizierungscode.
@@ -6229,6 +6657,7 @@ de: &de
   undo: Rückgängig
   redo: Wiederholen
   add_variable: Variable hinzufügen
+  variable: Variable
   enter_a_url_or_variable_name: Geben Sie eine URL oder einen Variablennamen ein
   new_token: Neues Token
   token: Token
@@ -6263,6 +6692,7 @@ de: &de
     invite: Einladung
     link: Link
     mcp: MCP
+    self: Selbst unterschreiben
   submission_event_names:
     send_email_to_html: '<b>E-Mail gesendet</b> an %{submitter_name}'
     bounce_email_html: '<b>E-Mail unzustellbar</b> %{submitter_name}'
@@ -6376,11 +6806,42 @@ de: &de
     submission_submitters: Liste der Unterzeichner
     submission_link: Link der Einreichung
     documents_link: Link der Dokumente
+  date:
+    abbr_month_names:
+      -
+      - Jan.
+      - Feb.
+      - März
+      - Apr.
+      - Mai
+      - Juni
+      - Juli
+      - Aug.
+      - Sept.
+      - Okt.
+      - Nov.
+      - Dez.
+    formats:
+      default: "%d.%m.%Y"
+      short: "%-d. %b"
+      long: "%-d. %B %Y"
   time:
     formats:
-      detailed: "%A, %d. %B %Y, %H:%M:%S Uhr"
+      short: "%-d. %b, %H:%M"
+      long: "%-d. %B %Y um %H:%M"
+      detailed: "%-d. %B %Y um %H:%M:%S"
 
 pl:
+  date:
+    formats:
+      default: "%d.%m.%Y"
+      short: "%-d %b"
+      long: "%-d %B %Y"
+  time:
+    formats:
+      short: "%-d %b, %H:%M"
+      long: "%-d %B %Y %H:%M"
+      detailed: "%-d %B %Y %H:%M:%S"
   require_phone_2fa_to_open: Wymagaj uwierzytelniania telefonicznego 2FA do otwarcia
   the_sender_has_requested_a_two_factor_authentication_via_one_time_password_sent_to_your_html: Nadawca zażądał uwierzytelnienia dwuskładnikowego poprzez jednorazowe hasło wysłane na Twój numer telefonu <b>%{phone}</b>.
   send_verification_code: Wyślij kod weryfikacyjny
@@ -6447,6 +6908,7 @@ pl:
   profile_details: Szczegóły profilu
   sign_up_with_google: Zarejestruj się przez Google
   sign_up_with_microsoft: Zarejestruj się przez Microsoft
+  redirecting_to_provider: Przekierowywanie do %{provider}...
   by_creating_an_account_you_agree_to_our_html: 'Tworząc konto, akceptujesz naszą <a target="_blank" href="https://www.docuseal.com/privacy">Politykę Prywatności</a> i <a target="_blank" href="https://www.docuseal.com/terms">Regulamin</a>.'
   enter_email_to_continue: Wprowadź e-mail, aby kontynuować
   the_code_has_been_sent_to_your_email: Kod został wysłany na Twój e-mail.
@@ -6482,6 +6944,44 @@ pl:
   too_many_requests_try_again_later: Zbyt wiele żądań. Spróbuj ponownie później.
 
 uk:
+  date:
+    month_names:
+      -
+      - січня
+      - лютого
+      - березня
+      - квітня
+      - травня
+      - червня
+      - липня
+      - серпня
+      - вересня
+      - жовтня
+      - листопада
+      - грудня
+    abbr_month_names:
+      -
+      - січ.
+      - лют.
+      - бер.
+      - квіт.
+      - трав.
+      - черв.
+      - лип.
+      - серп.
+      - вер.
+      - жовт.
+      - лист.
+      - груд.
+    formats:
+      default: "%d.%m.%Y"
+      short: "%-d %b"
+      long: "%-d %B %Y р."
+  time:
+    formats:
+      short: "%-d %b, %H:%M"
+      long: "%-d %B %Y р. о %H:%M"
+      detailed: "%-d %B %Y р. о %H:%M:%S"
   require_phone_2fa_to_open: Вимагати двофакторну автентифікацію через телефон для відкриття
   the_sender_has_requested_a_two_factor_authentication_via_one_time_password_sent_to_your_html: Відправник запитав двофакторну автентифікацію за допомогою одноразового пароля, надісланого на ваш номер телефону <b>%{phone}</b>.
   send_verification_code: Надіслати код перевірки
@@ -6548,6 +7048,7 @@ uk:
   profile_details: Дані профілю
   sign_up_with_google: Зареєструватися через Google
   sign_up_with_microsoft: Зареєструватися через Microsoft
+  redirecting_to_provider: Перенаправлення до %{provider}...
   by_creating_an_account_you_agree_to_our_html: 'Створюючи акаунт, ви погоджуєтесь з нашою <a target="_blank" href="https://www.docuseal.com/privacy">Політикою конфіденційності</a> і <a target="_blank" href="https://www.docuseal.com/terms">Умовами надання послуг</a>.'
   enter_email_to_continue: Введіть електронну пошту, щоб продовжити
   the_code_has_been_sent_to_your_email: Код було надіслано на вашу електронну пошту.
@@ -6583,6 +7084,44 @@ uk:
   too_many_requests_try_again_later: Забагато запитів. Спробуйте пізніше.
 
 cs:
+  date:
+    month_names:
+      -
+      - ledna
+      - února
+      - března
+      - dubna
+      - května
+      - června
+      - července
+      - srpna
+      - září
+      - října
+      - listopadu
+      - prosince
+    abbr_month_names:
+      -
+      - led
+      - úno
+      - bře
+      - dub
+      - kvě
+      - čvn
+      - čvc
+      - srp
+      - zář
+      - říj
+      - lis
+      - pro
+    formats:
+      default: "%d. %m. %Y"
+      short: "%-d. %-m."
+      long: "%-d. %B %Y"
+  time:
+    formats:
+      short: "%-d. %-m. %-H:%M"
+      long: "%-d. %B %Y v %-H:%M"
+      detailed: "%-d. %B %Y v %-H:%M:%S"
   require_phone_2fa_to_open: Vyžadovat otevření pomocí telefonního 2FA
   the_sender_has_requested_a_two_factor_authentication_via_one_time_password_sent_to_your_html: Odesílatel požádal o dvoufaktorové ověření pomocí jednorázového hesla zaslaného na vaše telefonní číslo <b>%{phone}</b>.
   send_verification_code: Odeslat ověřovací kód
@@ -6649,6 +7188,7 @@ cs:
   profile_details: Detaily profilu
   sign_up_with_google: Zaregistrovat se pomocí Googlu
   sign_up_with_microsoft: Zaregistrovat se pomocí Microsoftu
+  redirecting_to_provider: Přesměrování na %{provider}...
   by_creating_an_account_you_agree_to_our_html: 'Vytvořením účtu souhlasíte s našimi <a target="_blank" href="https://www.docuseal.com/privacy">Zásadami ochrany osobních údajů</a> a <a target="_blank" href="https://www.docuseal.com/terms">Podmínkami služby</a>.'
   enter_email_to_continue: Zadejte e-mail pro pokračování
   the_code_has_been_sent_to_your_email: Kód byl odeslán na váš e-mail.
@@ -6684,6 +7224,30 @@ cs:
   too_many_requests_try_again_later: Příliš mnoho požadavků. Zkuste to později.
 
 he:
+  date:
+    abbr_month_names:
+      -
+      - ינו׳
+      - פבר׳
+      - מרץ
+      - אפר׳
+      - מאי
+      - יוני
+      - יולי
+      - אוג׳
+      - ספט׳
+      - אוק׳
+      - נוב׳
+      - דצמ׳
+    formats:
+      default: "%d.%m.%Y"
+      short: "%-d ב%b"
+      long: "%-d ב%B %Y"
+  time:
+    formats:
+      short: "%-d ב%b, %-H:%M"
+      long: "%-d ב%B %Y בשעה %-H:%M"
+      detailed: "%-d ב%B %Y בשעה %-H:%M:%S"
   require_phone_2fa_to_open: דרוש אימות דו-שלבי באמצעות טלפון לפתיחה
   the_sender_has_requested_a_two_factor_authentication_via_one_time_password_sent_to_your_html: השולח ביקש אימות דו-שלבי באמצעות סיסמה חד פעמית שנשלחה למספר הטלפון שלך <b>%{phone}</b>.
   send_verification_code: שלח קוד אימות
@@ -6750,6 +7314,7 @@ he:
   profile_details: פרטי הפרופיל
   sign_up_with_google: הירשם עם גוגל
   sign_up_with_microsoft: הירשם עם מיקרוסופט
+  redirecting_to_provider: מפנה אל %{provider}...
   by_creating_an_account_you_agree_to_our_html: 'על ידי יצירת חשבון, אתה מסכים ל<a target="_blank" href="https://www.docuseal.com/privacy">מדיניות הפרטיות</a> ול<a target="_blank" href="https://www.docuseal.com/terms">תנאי השירות</a> שלנו.'
   enter_email_to_continue: הכנס דוא"ל כדי להמשיך
   the_code_has_been_sent_to_your_email: הקוד נשלח לדוא"ל שלך.
@@ -6821,6 +7386,27 @@ nl: &nl
   require_all_recipients: Alle ontvangers verplichten
   stripe_account_has_been_connected: Stripe-account is verbonden.
   re_connect_stripe: Stripe opnieuw verbinden
+  paypal_integration: PayPal-integratie
+  paypal_account_has_been_connected: PayPal-account is verbonden.
+  re_connect_paypal: PayPal opnieuw verbinden
+  failed_to_connect_paypal_please_try_again: PayPal kon niet worden verbonden. Probeer het opnieuw.
+  paypal_connection_was_not_completed: De verbinding met PayPal is niet voltooid.
+  disconnecting_your_paypal_account_will_prevent_you_from_offering_paypal_services_and_products_on_your_website_do_you_wish_to_continue: Het loskoppelen van uw PayPal-account voorkomt dat u PayPal-diensten en -producten op uw website kunt aanbieden. Wilt u doorgaan?
+  attention_you_currently_cannot_receive_payments_due_to_restriction_on_your_paypal_account_please_reach_out_to_paypal_customer_support_or_connect_to_paypal_com_for_more_information: 'Let op: U kunt momenteel geen betalingen ontvangen vanwege een beperking op uw PayPal-account. Neem contact op met de PayPal-klantenservice of ga naar https://www.paypal.com voor meer informatie.'
+  attention_please_confirm_your_email_address_on_paypal_com_in_order_to_receive_payments_you_currently_cannot_receive_payments: 'Let op: Bevestig uw e-mailadres op https://www.paypal.com/businessprofile/settings om betalingen te kunnen ontvangen! U kunt momenteel geen betalingen ontvangen.'
+  payment_receipt: Betalingsbewijs
+  amount_paid: Betaald bedrag
+  transaction: Transactie
+  transaction_id: Transactie-ID
+  order_id: Order-ID
+  payment_date: Datum
+  paid_by: Betaald door
+  paid_to: Betaald aan
+  business: Bedrijf
+  country: Land
+  payer_id: Betaler-ID
+  merchant_id: Verkoper-ID
+  breakdown: Specificatie
   bcc_recipients: BCC-ontvangers
   resend_pending: Opnieuw verzenden in behandeling
   always_enforce_signing_order: Ondertekenvolgorde altijd afdwingen
@@ -6854,22 +7440,27 @@ nl: &nl
   you_have_been_invited_to_account_name_product_name_please_sign_up_using_the_link_below_: 'U bent uitgenodigd voor %{account_name} %{product_name}. Meld u aan via de onderstaande link:'
   sent_using_product_name_in_testing_mode_html: Verzonden met <a href="%{product_url}">%{product_name}</a> in testmodus
   sent_using_product_name_free_document_signing_html: Verzonden met <a href="%{product_url}">%{product_name}</a> gratis documentondertekening.
+  sent_using_product_name_open_source_software_html: Verzonden met de open-source software <a href="%{product_url}">%{product_name}</a>.
   sent_with_docuseal_pro_html: Verzonden met <a href="%{product_url}">OpenSeal Pro</a>
   show_send_with_docuseal_pro_attribution_in_emails_html: Toon de vermelding 'Verzonden met <span class="link">OpenSeal Pro</span>' in e-mails
   ? sign_documents_with_trusted_certificate_provided_by_docu_seal_your_documents_and_data_are_never_shared_with_docu_seal_p_d_f_checksum_is_provided_to_generate_a_trusted_signature
   : Onderteken documenten met een vertrouwd certificaat geleverd door OpenSeal. Uw documenten en gegevens worden nooit gedeeld met OpenSeal. PDF-checksum wordt verstrekt om een vertrouwde handtekening te genereren.
   you_have_been_invited_to_submit_the_name_form: U bent uitgenodigd om het formulier "%{name}" in te dienen.
   you_have_been_invited_to_sign_the_name: U bent uitgenodigd om "%{name}" te ondertekenen.
+  you_have_been_invited_to_view_the_name: U bent uitgenodigd om "%{name}" te bekijken.
   alternatively_you_can_review_and_download_your_copy_using_the_link_below: 'U kunt uw exemplaar ook bekijken en downloaden via de onderstaande link:'
   please_check_the_copy_of_your_name_in_the_email_attachments: Controleer de kopie van uw "%{name}" in de e-mailbijlagen.
   awaiting_completion_by_the_other_party: In afwachting van voltooiing door de andere partij
   review_and_sign: Bekijken en ondertekenen
+  view_document: Document bekijken
   review_and_submit: Bekijken en indienen
   please_contact_us_by_replying_to_this_email_if_you_have_any_questions: Neem contact met ons op door op deze e-mail te antwoorden als u vragen heeft.
   submitter_invitation_sms_body_sign: "{account.name} heeft u uitgenodigd om een document te ondertekenen: {submitter.link}"
+  submitter_invitation_sms_body_view: "{account.name} heeft u uitgenodigd om een document te bekijken: {submitter.link}"
   verification_code_sms_body: 'Verificatiecode: {code}'
   you_are_invited_to_submit_a_form: U bent uitgenodigd om een formulier in te dienen
   you_are_invited_to_sign_a_document: U bent uitgenodigd om een document te ondertekenen
+  you_are_invited_to_view_a_document: U bent uitgenodigd om een document te bekijken
   you_are_invited_to_sign_documents: U bent uitgenodigd om documenten te ondertekenen
   your_document_copy: Uw documentkopie
   name_has_been_completed_by_submitters: '"%{name}" is voltooid door %{submitters}.'
@@ -6880,6 +7471,17 @@ nl: &nl
     U bent uitgenodigd om "{template.name}" te ondertekenen.
 
     [Bekijken en ondertekenen]({submitter.link})
+
+    Neem contact met ons op door op deze e-mail te antwoorden als u vragen heeft.
+
+    Bedankt,
+    {account.name}
+  submitter_invitation_email_view_body: |
+    Hallo,
+
+    U bent uitgenodigd om "{template.name}" te bekijken.
+
+    [Document bekijken]({submitter.link})
 
     Neem contact met ons op door op deze e-mail te antwoorden als u vragen heeft.
 
@@ -6959,6 +7561,7 @@ nl: &nl
   profile_details: Profielgegevens
   sign_up_with_google: Registreren met Google
   sign_up_with_microsoft: Registreren met Microsoft
+  redirecting_to_provider: Doorverwijzen naar %{provider}...
   by_creating_an_account_you_agree_to_our_html: Door een account aan te maken gaat u akkoord met ons <a target="_blank" href="https://www.docuseal.com/privacy">Privacybeleid</a> en onze <a target="_blank" href="https://www.docuseal.com/terms">Servicevoorwaarden</a>.
   enter_email_to_continue: Voer e-mailadres in om door te gaan
   account: Account
@@ -7075,6 +7678,8 @@ nl: &nl
   invalid_timeserver: Ongeldige tijdserver
   email_templates: E-mailsjablonen
   signature_request_email: E-mail voor handtekeningverzoek
+  view_documents_email: E-mail voor documentweergave
+  view_only: Alleen bekijken
   signature_request_reminder_email: E-mailherinnering voor handtekeningverzoek
   signature_request_sms: SMS voor handtekeningverzoek
   verification_code_sms: Verificatiecode-SMS
@@ -7084,6 +7689,13 @@ nl: &nl
   completed_form_message: Bericht voltooid formulier
   completed_form_redirect_button: Knop voor doorverwijzing na voltooid formulier
   documents_copy_email: E-mail met kopie van documenten
+  signature_request_email_sent_to_recipients_with_a_link_to_review_and_sign: E-mail met het handtekeningverzoek die naar de ontvangers wordt verzonden met een link om te bekijken en te ondertekenen.
+  view_only_email_sent_to_recipients_that_need_to_only_review_the_documents: E-mail met alleen weergave die wordt verzonden naar ontvangers die de documenten alleen hoeven te bekijken.
+  reminds_recipients_who_havent_completed_their_part_yet_to_sign_following_the_reminders_schedule: Herinnert ontvangers die hun deel nog niet hebben voltooid eraan te ondertekenen, volgens het herinneringsschema.
+  signature_request_sms_sent_to_recipients_with_a_link_to_review_and_sign: Sms met het handtekeningverzoek die naar de ontvangers wordt verzonden met een link om te bekijken en te ondertekenen.
+  phone_2fa_verification_text_message: Sms-bericht voor 2FA-verificatie via telefoon.
+  notification_email_sent_to_the_sender_user_and_bcc_addresses_once_the_submission_is_completed_by_all_parties: Meldingse-mail die naar de verzendende gebruiker en de BCC-adressen wordt gestuurd zodra de indiening door alle partijen is voltooid.
+  completed_documents_copy_email_sent_to_recipients_upon_completion_containing_their_documents: E-mail met een kopie van de voltooide documenten die na voltooiing naar de ontvangers wordt verzonden.
   form_custom_css: Aangepaste CSS voor formulier
   subject: Onderwerp
   body: Inhoud
@@ -7206,7 +7818,7 @@ nl: &nl
   back_to_active: Terug naar Actief
   submissions: Inzendingen
   templates: Sjablonen
-  document_templates_html: <span class="md:hidden">Sjablonen</span><span class="hidden md:inline">Documentsjablonen</span>
+  document_templates_html: <span class="lg:hidden">Sjablonen</span><span class="hidden lg:inline">Documentsjablonen</span>
   archived: Gearchiveerd
   search: Zoeken
   submissions_not_found: Geen inzendingen gevonden
@@ -7326,6 +7938,9 @@ nl: &nl
   there_are_no_signatures: Er zijn geen handtekeningen
   signed_with_trusted_certificate: Ondertekend met vertrouwd certificaat
   signed_with_external_certificate: Ondertekend met extern certificaat
+  signature_valid: Handtekening geldig
+  signature_verification_failed: Verificatie van handtekening mislukt
+  contains_unsigned_changes_after_the_last_signature: Bevat niet-ondertekende wijzigingen na de laatste handtekening
   setup_2fa_to_continue: Stel 2FA in om door te gaan.
   create_a_new_account: Maak een nieuw account aan.
   you_are_already_signed_in: U bent al aangemeld.
@@ -7338,6 +7953,7 @@ nl: &nl
   form_has_been_archived: Formulier is gearchiveerd.
   form_has_been_expired: Formulier is verlopen.
   form_has_been_declined: Formulier is geweigerd.
+  form_is_view_only: Formulier is alleen-lezen.
   file_is_missing: Bestand ontbreekt
   folder_name_has_been_updated: Mapnaam is bijgewerkt.
   unable_to_rename_folder: Kan map niet hernoemen.
@@ -7422,6 +8038,10 @@ nl: &nl
   signers: Ondertekenaars
   not_invited_yet: Nog niet uitgenodigd
   not_completed_yet: Nog niet voltooid
+  not_completed: Niet voltooid
+  not_viewed_yet: Nog niet bekeken
+  not_viewed: Niet bekeken
+  viewed_on_time: Bekeken op %{time}
   declined_on_time: Geweigerd op %{time}
   expire_on_time: Verloopt op %{time}
   sign_in_person: In persoon ondertekenen
@@ -7639,6 +8259,7 @@ nl: &nl
   mobile: Mobiel
   tablet: Tablet
   reset_default: Standaard herstellen
+  smtp_settings_have_been_reset: De SMTP-instellingen zijn hersteld.
   send_signature_request_email: E-mail met handtekeningaanvraag verzenden
   last_3_months: Afgelopen 3 maanden
   last_6_months: Afgelopen 6 maanden
@@ -7669,6 +8290,7 @@ nl: &nl
   please_verify_your_email_address_to_continue: Bevestig uw e-mailadres om door te gaan.
   verification_code_sent_click_link_or_enter_code: Er is een verificatiecode naar uw e-mail gestuurd. U kunt op de link in de e-mail klikken of de code hieronder invoeren.
   use_otp_code_to_verify_email_or_click_link_below_html: 'Gebruik code <b>%{code}</b> om uw e-mail te verifiëren of klik op de link hieronder:'
+  use_otp_code_to_verify_email_html: 'Gebruik code <b>%{code}</b> om uw e-mail te verifiëren:'
   verify_your_email: Uw e-mail verifiëren
   your_email_has_been_confirmed: Uw e-mailadres is bevestigd.
   invalid_or_expired_verification_code: Ongeldige of verlopen verificatiecode.
@@ -7684,6 +8306,7 @@ nl: &nl
   undo: Ongedaan maken
   redo: Opnieuw
   add_variable: Variabele toevoegen
+  variable: Variabele
   enter_a_url_or_variable_name: Voer een URL of variabelenaam in
   new_token: Nieuw token
   token: Token
@@ -7718,6 +8341,7 @@ nl: &nl
     invite: Uitnodiging
     link: Link
     mcp: MCP
+    self: Zelf ondertekenen
   submission_event_names:
     send_email_to_html: "<b>E-mail verzonden</b> naar %{submitter_name}"
     bounce_email_html: "<b>E-mail geretourneerd</b> %{submitter_name}"
@@ -7831,11 +8455,29 @@ nl: &nl
     submission_submitters: Lijst van ondertekenaars
     submission_link: Link van de inzending
     documents_link: Link van de documenten
+  date:
+    formats:
+      short: "%-d %b"
+      long: "%-d %B %Y"
   time:
     formats:
-      detailed: "%d %B %Y %H:%M:%S"
+      short: "%-d %b, %H:%M"
+      long: "%-d %B %Y om %H:%M"
+      detailed: "%-d %B %Y om %H:%M:%S"
 
 ar:
+  date:
+    formats:
+      default: "%d‏/%m‏/%Y"
+      short: "%-d %b"
+      long: "%-d %B %Y"
+  time:
+    am: "ص"
+    pm: "م"
+    formats:
+      short: "%-d %b، %-I:%M %p"
+      long: "%-d %B %Y في %-I:%M %p"
+      detailed: "%-d %B %Y في %-I:%M:%S %p"
   require_phone_2fa_to_open: "يتطلب المصادقة الثنائية عبر الهاتف للفتح"
   the_sender_has_requested_a_two_factor_authentication_via_one_time_password_sent_to_your_html: "طلب المرسل المصادقة الثنائية عبر كلمة مرور لمرة واحدة مرسلة إلى رقم هاتفك <b>%{phone}</b>."
   send_verification_code: "إرسال رمز التحقق"
@@ -7902,6 +8544,7 @@ ar:
   profile_details: تفاصيل الملف الشخصي
   sign_up_with_google: الاشتراك باستخدام جوجل
   sign_up_with_microsoft: الاشتراك باستخدام مايكروسوفت
+  redirecting_to_provider: جارٍ إعادة التوجيه إلى %{provider}...
   by_creating_an_account_you_agree_to_our_html: 'من خلال إنشاء حساب، فإنك توافق على <a target="_blank" href="https://www.docuseal.com/privacy">سياسة الخصوصية</a> و<a target="_blank" href="https://www.docuseal.com/terms">شروط الخدمة</a> الخاصة بنا.'
   enter_email_to_continue: أدخل البريد الإلكتروني للمتابعة
   the_code_has_been_sent_to_your_email: تم إرسال الرمز إلى بريدك الإلكتروني.
@@ -7937,6 +8580,16 @@ ar:
   too_many_requests_try_again_later: طلبات كثيرة جدًا. حاول مرة أخرى لاحقًا.
 
 ko:
+  date:
+    formats:
+      default: "%Y. %m. %d."
+      short: "%b %-d일"
+      long: "%Y년 %B %-d일"
+  time:
+    formats:
+      short: "%b %-d일 %p %-I:%M"
+      long: "%Y년 %B %-d일 %p %-I:%M"
+      detailed: "%Y년 %B %-d일 %p %-I:%M:%S"
   require_phone_2fa_to_open: 열려면 휴대폰 2FA 요구
   the_sender_has_requested_a_two_factor_authentication_via_one_time_password_sent_to_your_html: 발신자가 <b>%{phone}</b> 전화번호로 전송된 일회용 비밀번호를 통해 2단계 인증을 요청했습니다.
   send_verification_code: 인증 코드 보내기
@@ -8003,6 +8656,7 @@ ko:
   profile_details: 프로필 세부 정보
   sign_up_with_google: Google로 가입
   sign_up_with_microsoft: Microsoft로 가입
+  redirecting_to_provider: "%{provider}(으)로 이동 중..."
   by_creating_an_account_you_agree_to_our_html: '계정을 생성함으로써, <a target="_blank" href="https://www.docuseal.com/privacy">개인정보 처리방침</a> 및 <a target="_blank" href="https://www.docuseal.com/terms">서비스 약관</a>에 동의하게 됩니다.'
   enter_email_to_continue: 계속하려면 이메일을 입력하세요
   the_code_has_been_sent_to_your_email: 코드가 이메일로 전송되었습니다.
@@ -8038,6 +8692,16 @@ ko:
   too_many_requests_try_again_later: 요청이 너무 많습니다. 나중에 다시 시도하세요.
 
 ja:
+  date:
+    formats:
+      default: "%Y/%m/%d"
+      short: "%-m月%-d日"
+      long: "%Y年%-m月%-d日"
+  time:
+    formats:
+      short: "%-m月%-d日 %-H:%M"
+      long: "%Y年%-m月%-d日 %-H:%M"
+      detailed: "%Y年%-m月%-d日 %-H:%M:%S"
   require_phone_2fa_to_open: 電話による2段階認証が必要です
   the_sender_has_requested_a_two_factor_authentication_via_one_time_password_sent_to_your_html: 送信者は、<b>%{phone}</b> に送信されたワンタイムパスワードによる2段階認証を要求しました。
   send_verification_code: 認証コードを送信
@@ -8104,6 +8768,7 @@ ja:
   profile_details: プロフィールの詳細
   sign_up_with_google: Googleで登録
   sign_up_with_microsoft: Microsoftで登録
+  redirecting_to_provider: "%{provider} にリダイレクトしています..."
   by_creating_an_account_you_agree_to_our_html: '<a target="_blank" href="https://www.docuseal.com/privacy">プライバシーポリシー</a>および<a target="_blank" href="https://www.docuseal.com/terms">利用規約</a>に同意の上、アカウントを作成します。'
   enter_email_to_continue: 続行するにはメールを入力してください
   the_code_has_been_sent_to_your_email: コードがあなたのメールに送信されました
@@ -8140,21 +8805,33 @@ ja:
 
 en-US:
   <<: *en
-  date:
-    formats:
-      default: "%m/%d/%Y"
-  time:
-    formats:
-      detailed: "%B %d, %Y %I:%M:%S %p"
 
 en-GB:
   <<: *en
   date:
+    abbr_month_names:
+      -
+      - Jan
+      - Feb
+      - Mar
+      - Apr
+      - May
+      - Jun
+      - Jul
+      - Aug
+      - Sept
+      - Oct
+      - Nov
+      - Dec
     formats:
       default: "%d/%m/%Y"
+      short: "%-d %b"
+      long: "%-d %B %Y"
   time:
     formats:
-      detailed: "%d %B, %Y %H:%M:%S"
+      short: "%-d %b, %H:%M"
+      long: "%-d %B %Y at %H:%M"
+      detailed: "%-d %B %Y at %H:%M:%S"
 
 es-ES:
   <<: *es

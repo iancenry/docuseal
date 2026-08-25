@@ -1,5 +1,5 @@
 <div class="mt-2 mb-1">
-  <div class="tooltip w-full" data-tip="<%= t('configure_sms_in_settings', default: 'Configure SMS provider in Settings > SMS') %>">
+  <div class="tooltip tooltip-no-touch w-full" data-tip="<%= t('configure_sms_in_settings', default: 'Configure SMS provider in Settings > SMS') %>">
     <button class="btn btn-sm btn-primary w-full" disabled>
       <%= submitter.sent_at? ? t('re_send_sms') : t('send_sms') %>
     </button>

@@ -10,7 +10,12 @@
       <%= f.hidden_field :key %>
       <%= f.fields_for :value, Struct.new(:subject, :body, :reply_to).new(*f.object.value.values_at('subject', 'body', 'reply_to')) do |ff| %>
         <div class="form-control">
-          <%= ff.label :subject, t('subject'), class: 'label' %>
+          <div class="flex items-center">
+            <%= ff.label :subject, t('subject'), class: 'label' %>
+            <span class="tooltip tooltip-right" data-tip="<%= t('signature_request_email_sent_to_recipients_with_a_link_to_review_and_sign') %>">
+              <%= svg_icon('info_circle', class: 'w-4 h-4') %>
+            </span>
+          </div>
           <%= ff.text_field :subject, required: true, class: 'base-input', dir: 'auto' %>
         </div>
         <%= render 'personalization_settings/email_body_field', ff:, config: f.object %>

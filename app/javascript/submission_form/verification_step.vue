@@ -91,6 +91,11 @@ export default {
     submitterSlug: {
       type: String,
       required: true
+    },
+    fetchOptions: {
+      type: Object,
+      required: false,
+      default: () => ({})
     }
   },
   emits: ['focus', 'submit', 'update:model-value', 'attached'],
@@ -163,7 +168,8 @@ export default {
           submitter_slug: this.submitterSlug,
           redirect_url: document.location.href
         }),
-        headers: { 'Content-Type': 'application/json' }
+        ...this.fetchOptions,
+        headers: { 'Content-Type': 'application/json', ...this.fetchOptions.headers }
       }).then(async (resp) => {
         this.eidEasyData = await resp.json()
 
@@ -205,7 +211,8 @@ export default {
         body: JSON.stringify({
           submitter_slug: this.submitterSlug
         }),
-        headers: { 'Content-Type': 'application/json' }
+        ...this.fetchOptions,
+        headers: { 'Content-Type': 'application/json', ...this.fetchOptions.headers }
       })
 
       if (resp.status === 404) {

@@ -312,6 +312,11 @@ export default {
     values: {
       type: Object,
       required: true
+    },
+    fetchOptions: {
+      type: Object,
+      required: false,
+      default: () => ({})
     }
   },
   emits: ['submit'],
@@ -494,8 +499,9 @@ export default {
 
         const resp = await fetch(this.baseUrl + '/api/kba', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          ...this.fetchOptions,
+          headers: { 'Content-Type': 'application/json', ...this.fetchOptions.headers }
         })
 
         const data = await resp.json()
@@ -550,7 +556,8 @@ export default {
             reference: this.reference,
             submitter_slug: this.submitterSlug
           }),
-          headers: { 'Content-Type': 'application/json' }
+          ...this.fetchOptions,
+          headers: { 'Content-Type': 'application/json', ...this.fetchOptions.headers }
         })
 
         const data = await resp.json()

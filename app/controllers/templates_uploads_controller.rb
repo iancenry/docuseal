@@ -6,7 +6,9 @@ class TemplatesUploadsController < ApplicationController
   layout 'plain'
 
   def show
-    redirect_to root_path if params[:url].blank?
+    url_uri = Addressable::URI.parse(params[:url].to_s)
+
+    redirect_to root_path if url_uri.normalized_scheme != 'https' || url_uri.host.blank?
   end
 
   def create
