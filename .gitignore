@@ -42,3 +42,9 @@ pg_data/
 docuseal/
 
 /vendor/bundle
+
+# Node port
+server/node_modules/
+server/dist/
+server/.env
+*.tsbuildinfo

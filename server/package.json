@@ -1,0 +1,32 @@
+{
+  "name": "@openseal/server",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "schema:from-rails": "ruby ../scripts/generate_drizzle_schema.rb",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "dotenv": "^17.0.0",
+    "drizzle-orm": "^0.44.0",
+    "express": "^5.1.0",
+    "koffi": "^2.12.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^24.0.0",
+    "drizzle-kit": "^0.31.0",
+    "postgres": "^3.4.7",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}
